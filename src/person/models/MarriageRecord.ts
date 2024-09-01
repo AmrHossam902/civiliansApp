@@ -1,18 +1,7 @@
 import { AutoIncrement, BelongsTo, Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from "sequelize-typescript";
-import { Per, Person } from "./Person";
+import { Person } from "./Person";
 
-export interface MarriageRecord {
 
-    id?: string;
-    publicId?: string; 
-
-    husbandId: number;
-    wifeId: number;
-    mDate: Date;
-
-    rType: number; //marriage / divorce
-
-}
 
 @Table({
     charset: "utf8mb4",
@@ -30,12 +19,12 @@ export class MRecord extends Model{
     @Column(DataType.STRING)
     publicId: string; 
 
-    @ForeignKey( ()=> Per )
+    @ForeignKey( ()=> Person )
     @Column(DataType.INTEGER)
     husbandId: number;
 
 
-    @ForeignKey( ()=>Per )
+    @ForeignKey( ()=>Person )
     @Column(DataType.INTEGER)
     wifeId: number;
 

@@ -1,13 +1,14 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { schema } from "./schema";
-import { generatePeople } from "./dataGenerator";
-import { PersonService } from "./person/person.service";
+import { GeneratorService } from "./person/generator.service";
+
 import { Person } from "./person/models/Person";
 
+import { Db } from "./database/db-client";
 
 
-const resolvers = {
+/* const resolvers = {
     Query: {
         people : () => {
             const personService: PersonService = PersonService.getInstance();
@@ -33,11 +34,11 @@ const resolvers = {
             return personService.getPersonSiblings(parent);
         }
     }
-};
+}; */
 
 const server = new ApolloServer({
     typeDefs: schema,
-    resolvers: resolvers
+    //resolvers: resolvers
 });
 
 
@@ -46,6 +47,26 @@ startStandaloneServer(server, {
 })
 .then ( ({ url}) =>{
     console.log(`🚀  Server ready at: ${url}`);
+    new Db();
+    setTimeout(()=>{    
+        let genService = new GeneratorService();
+        
+        genService.generateSeeds()
+        .then( async()=>{
+            for(let i=0; i< 3; i++){
+                await genService.generateRound()
+            }
+        })
+        .then(
+            ()=>{
+                console.log("data generated successfully");
+            }
+        )
+        .catch((e)=>{
+            console.log(e);
+        })
+
+    }, 5000);
 
 })
 /* .then(()=>{

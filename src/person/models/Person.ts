@@ -2,29 +2,6 @@
 import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedAt, Model } from "sequelize-typescript";
 
 
-export interface Person {
-
-    id?: string;
-    publicId?: string; 
-
-    firstName: string;
-    lastName: string;
-    middleName: string;
-    
-    ssn: string;
-    gender: boolean;
-    birthDate: Date;
-    deathDate?: Date;
-    address: string;
-    
-    
-    father_id?: number;
-    mother_id?: number;
-    
-    createdAt?: Date;
-    updateAt?: Date;
-}
-
 
 @Table({
     charset: "utf8mb4",
@@ -32,12 +9,11 @@ export interface Person {
     tableName: "person",
     freezeTableName: true
 })
-export class Per extends Model {
+export class Person extends Model {
 
-    
+    @AutoIncrement    
     @PrimaryKey
     @Column(DataType.INTEGER)
-    @AutoIncrement
     id: number;
 
     @Column(DataType.STRING(20) )
@@ -64,10 +40,10 @@ export class Per extends Model {
     @Column(DataType.STRING(100) )
     address: string;
     
-    @Column(DataType.NUMBER)
+    @Column(DataType.INTEGER)
     father_id?: number;
 
-    @Column(DataType.NUMBER)
+    @Column(DataType.INTEGER)
     mother_id?: number;
     
     @CreatedAt
