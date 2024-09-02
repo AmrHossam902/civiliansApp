@@ -1,5 +1,5 @@
 
-import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedAt, Model } from "sequelize-typescript";
+import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedAt, Model, Index } from "sequelize-typescript";
 
 
 
@@ -16,18 +16,23 @@ export class Person extends Model {
     @Column(DataType.INTEGER)
     id: number;
 
-    @Column(DataType.STRING(20) )
+    @Index({ order: "ASC" , using: "BTREE"})
+    @Column(DataType.STRING(40) )
     firstName: string;
 
-    @Column(DataType.STRING(20))
+    @Index({ order: "ASC" , using: "BTREE"})
+    @Column(DataType.STRING(40))
     lastName: string;
 
+    @Index({ order: "ASC" , using: "BTREE"})
     @Column(DataType.STRING(40) )
     middleName: string;
     
+    @Index({ order: "ASC" , type: "UNIQUE", using: "BTREE"})
     @Column(DataType.STRING(30) )
     ssn: string;
 
+    @Index({ order: "ASC" , using: "BTREE"})
     @Column(DataType.TINYINT)
     gender: boolean;
 

@@ -1,4 +1,4 @@
-import { AutoIncrement, BelongsTo, Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from "sequelize-typescript";
+import { AutoIncrement, BelongsTo, Column, CreatedAt, DataType, ForeignKey, HasOne, Index, Model, PrimaryKey, Table, UpdatedAt } from "sequelize-typescript";
 import { Person } from "./Person";
 
 
@@ -16,6 +16,7 @@ export class MRecord extends Model{
     @Column
     id: number;
 
+    @Index({ type: "UNIQUE", using: "BTREE"})
     @Column(DataType.STRING)
     publicId: string; 
 
@@ -23,10 +24,15 @@ export class MRecord extends Model{
     @Column(DataType.INTEGER)
     husbandId: number;
 
+    @HasOne(()=> Person)
+    husband: Person 
 
     @ForeignKey( ()=>Person )
     @Column(DataType.INTEGER)
     wifeId: number;
+
+    @HasOne(()=> Person)
+    wife: Person;
 
     @Column(DataType.DATE)
     mDate: Date;
