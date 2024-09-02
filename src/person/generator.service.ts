@@ -18,14 +18,14 @@ interface Bucket {
 export class GeneratorService {
 
 
-    static readonly seedsCount = 1000;
-    static readonly malesRate = 0.4;
-    static readonly avgAge = 60;
-    static readonly maxNextSiblingDuration = 3 //years
-    static readonly startYear: number = 1940;
-    static readonly generationRounds: number = 3;
-    static readonly yearsPerBucket: number = 8;
-    static readonly averageMarriageAge: number = 20;
+    readonly seedsCount = 1000;
+    readonly malesRate = 0.4;
+    readonly avgAge = 60;
+    readonly maxNextSiblingDuration = 3 //years
+    readonly startYear: number = 1940;
+    readonly generationRounds: number = 3;
+    readonly yearsPerBucket: number = 8;
+    readonly averageMarriageAge: number = 20;
 
 
     buckets: Bucket[] = [];
@@ -34,7 +34,7 @@ export class GeneratorService {
 
     constructor(){
         
-        let i = GeneratorService.startYear;
+        let i = this.startYear;
         const currentYear = new Date().getFullYear();
         while(i < currentYear){
             this.buckets.push({
@@ -47,18 +47,32 @@ export class GeneratorService {
                 females: []
             });
 
-            i += GeneratorService.yearsPerBucket;
+            i += this.yearsPerBucket;
         }
 
     }
 
+    /**
+     * populates the database with fake people from 
+     * start year till now 
+     */
+    populateDB(){
+
+        this.generateSeeds()
+        .then(async ()=>{
+
+            while(!this.bucketsAreEmpty()){
+                await this.generateRound()
+            }
+        })
+    }
 
     async generateSeeds(){
         
-        for(let i =0; i< GeneratorService.seedsCount; i++){
-            console.log("generating ", i);
+        for(let i =0; i< this.seedsCount; i++){
+
             let gender : "male" | "female"
-                = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[GeneratorService.malesRate, 1] }) == 1 ? "male": "female";
+                = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[this.malesRate, 1] }) == 1 ? "male": "female";
     
     
             let p: Person = new Person();
@@ -70,14 +84,14 @@ export class GeneratorService {
             p.address= faker.location.streetAddress({ useFullAddress: true});
             p.birthDate= faker.date.between(
                 {
-                    "from": `${GeneratorService.startYear}-01-01`, 
-                    "to": `${GeneratorService.startYear + GeneratorService.yearsPerBucket}-01-01`
+                    "from": `${this.startYear}-01-01`, 
+                    "to": `${this.startYear + this.yearsPerBucket}-01-01`
                 }
             );
 
     
             //generate age 
-            let age = RandomGenService.generateSymExpRV(GeneratorService.avgAge, 0.2);
+            let age = RandomGenService.generateSymExpRV(this.avgAge, 0.2);
             let deathDate = new Date(p.birthDate);
             deathDate.setFullYear(deathDate.getFullYear() + age);
     
@@ -89,8 +103,8 @@ export class GeneratorService {
             
             //save in a bucket
             let bucketIndex = Math.floor(
-                (   p.birthDate.getFullYear() - GeneratorService.startYear )
-                / GeneratorService.yearsPerBucket
+                (   p.birthDate.getFullYear() - this.startYear )
+                / this.yearsPerBucket
             );
             if(p.gender)
                 this.buckets[bucketIndex].males.push(p);
@@ -98,13 +112,14 @@ export class GeneratorService {
                 this.buckets[bucketIndex].females.push(p);
     
             await p.save();
+            console.log("saving seed ", p.id);
         
         }
 
 
     }
 
-
+        
     async generateRound(){
 
         //loop over all buckets and exhaust them
@@ -113,6 +128,7 @@ export class GeneratorService {
 
             try {
 
+                //exhaust the bucket
                 while(true){
                     let [male, female] = this.extractPair(i);    
                 
@@ -139,7 +155,7 @@ export class GeneratorService {
                         continue;
 
                     await mRecord.save();
-
+                    console.log(`saving marriage record, male = ${male.id}, female=${female.id}`);
 
                     //generate children
                     await this.generateChildren(male, female, marriageDate);
@@ -147,7 +163,11 @@ export class GeneratorService {
                 }
 
             } catch (error) {
-                console.log(error);
+                if(error instanceof NoMalesFound ||
+                    error instanceof NoFemalesFound ||
+                    error instanceof NoPairFound
+                )    
+                console.log(error.message);
             }
 
         }
@@ -159,7 +179,6 @@ export class GeneratorService {
 
 
     }
-
 
 
     extractPair(bucketIndex: number): [Person, Person]{
@@ -244,7 +263,7 @@ export class GeneratorService {
             let p: Person = new Person();
 
             let gender : "male" | "female"
-                = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[GeneratorService.malesRate, 1] }) == 1 ? "male": "female";
+                = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[this.malesRate, 1] }) == 1 ? "male": "female";
 
             p.firstName  = faker.person.firstName(gender);
             p.middleName = male.firstName;
@@ -258,7 +277,7 @@ export class GeneratorService {
                 new Date( 
                     randomInt(
                         lastSiblingBirthYear + 1,
-                        lastSiblingBirthYear + GeneratorService.maxNextSiblingDuration
+                        lastSiblingBirthYear + this.maxNextSiblingDuration
                     ),
                     randomInt(0,11),
                     randomInt(1, 28)
@@ -269,7 +288,7 @@ export class GeneratorService {
                 continue;
 
             //generate age 
-            let age = RandomGenService.generateSymExpRV(GeneratorService.avgAge, 0.2);
+            let age = RandomGenService.generateSymExpRV(this.avgAge, 0.2);
             let deathDate = new Date(p.birthDate);
             deathDate.setFullYear(deathDate.getFullYear() + age);
 
@@ -280,8 +299,8 @@ export class GeneratorService {
 
             let bucketIndex: number = 
             Math.floor(
-                (   p.birthDate.getFullYear() - GeneratorService.startYear )
-                / GeneratorService.yearsPerBucket
+                (   p.birthDate.getFullYear() - this.startYear )
+                / this.yearsPerBucket
             );
             
 
@@ -291,6 +310,7 @@ export class GeneratorService {
                 this.childrenBuckets[bucketIndex].females.push(p);
 
             await p.save();
+            console.log(`saving new born ${p.id}, mother=${female.id}, father=${male.id}`);
 
         }
     }
@@ -298,7 +318,7 @@ export class GeneratorService {
     resetChildrenBuckets(){
         this.childrenBuckets = [];
 
-        let i = GeneratorService.startYear;
+        let i = this.startYear;
         const currentYear = new Date().getFullYear();
         while(i < currentYear){
 
@@ -307,7 +327,18 @@ export class GeneratorService {
                 females: []
             });
 
-            i += GeneratorService.yearsPerBucket;
+            i += this.yearsPerBucket;
         }
+    }
+
+    /**returns true if all buckets are empty
+     * indicating no need for more rounds
+     */
+    bucketsAreEmpty(){
+  
+        return this.buckets.every( (bucket: Bucket)=>{
+            return ! bucket.males.length && ! bucket.females.length  
+        })
+
     }
 }

@@ -51,37 +51,8 @@ startStandaloneServer(server, {
     setTimeout(()=>{    
         let genService = new GeneratorService();
         
-        genService.generateSeeds()
-        .then( async()=>{
-            for(let i=0; i< 3; i++){
-                await genService.generateRound()
-            }
-        })
-        .then(
-            ()=>{
-                console.log("data generated successfully");
-            }
-        )
-        .catch((e)=>{
-            console.log(e);
-        })
+        genService.populateDB();
 
     }, 5000);
 
 })
-/* .then(()=>{
-    const personService: PersonService = PersonService.getInstance();
-    personService.getAllPersons()
-    .then((res: Person[])=>{
-        console.log(res);
-    });
-}) */
-/* .then(async ()=>{
-    const personService: PersonService = PersonService.getInstance();
-    let ps: Person[] = generatePeople(20);
-
-    for(let i=0; i< 20; i++){
-        await personService.createNewPerson(ps[i]);
-    }
-});
- */  
