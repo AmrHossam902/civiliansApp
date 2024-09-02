@@ -71,48 +71,55 @@ export class GeneratorService {
         
         for(let i =0; i< this.seedsCount; i++){
 
-            let gender : "male" | "female"
-                = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[this.malesRate, 1] }) == 1 ? "male": "female";
-    
-    
-            let p: Person = new Person();
-            p.firstName  = faker.person.firstName(gender);
-            p.middleName = faker.person.middleName(gender);
-            p.lastName = faker.person.lastName(gender);
-            p.gender =  gender == "male" ? true : false;
-            p.ssn = faker.string.alphanumeric(10);
-            p.address= faker.location.streetAddress({ useFullAddress: true});
-            p.birthDate= faker.date.between(
-                {
-                    "from": `${this.startYear}-01-01`, 
-                    "to": `${this.startYear + this.yearsPerBucket}-01-01`
-                }
-            );
+            try {
+                let gender : "male" | "female"
+                    = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[this.malesRate, 1] }) == 1 ? "male": "female";
+        
+        
+                let p: Person = new Person();
+                p.firstName  = faker.person.firstName(gender).substring(0, 40);
+                p.middleName = faker.person.middleName(gender).substring(0, 40);
+                p.lastName = faker.person.lastName(gender).substring(0, 40);
+                p.gender =  gender == "male" ? true : false;
+                p.ssn = faker.string.alphanumeric(10);
+                p.address= faker.location.streetAddress({ useFullAddress: true});
+                p.birthDate= faker.date.between(
+                    {
+                        "from": `${this.startYear}-01-01`, 
+                        "to": `${this.startYear + this.yearsPerBucket}-01-01`
+                    }
+                );
 
-    
-            //generate age 
-            let age = RandomGenService.generateSymExpRV(this.avgAge, 0.2);
-            let deathDate = new Date(p.birthDate);
-            deathDate.setFullYear(deathDate.getFullYear() + age);
-    
-            if(Date.now() > deathDate.getTime()  ){
-                //person has died
-                p.deathDate = deathDate
+        
+                //generate age 
+                let age = RandomGenService.generateSymExpRV(this.avgAge, 0.2);
+                let deathDate = new Date(p.birthDate);
+                deathDate.setFullYear(deathDate.getFullYear() + age);
+        
+                if(Date.now() > deathDate.getTime()  ){
+                    //person has died
+                    p.deathDate = deathDate
+                }
+        
+                
+                //save in a bucket
+                let bucketIndex = Math.floor(
+                    (   p.birthDate.getFullYear() - this.startYear )
+                    / this.yearsPerBucket
+                );
+                if(p.gender)
+                    this.buckets[bucketIndex].males.push(p);
+                else 
+                    this.buckets[bucketIndex].females.push(p);
+        
+
+                await p.save();
+                console.log("saving seed ", p.id);
+            } catch (error) {
+                console.log(error);
             }
-    
-            
-            //save in a bucket
-            let bucketIndex = Math.floor(
-                (   p.birthDate.getFullYear() - this.startYear )
-                / this.yearsPerBucket
-            );
-            if(p.gender)
-                this.buckets[bucketIndex].males.push(p);
-            else 
-                this.buckets[bucketIndex].females.push(p);
-    
-            await p.save();
-            console.log("saving seed ", p.id);
+
+
         
         }
 
@@ -265,7 +272,7 @@ export class GeneratorService {
             let gender : "male" | "female"
                 = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[this.malesRate, 1] }) == 1 ? "male": "female";
 
-            p.firstName  = faker.person.firstName(gender);
+            p.firstName  = faker.person.firstName(gender).substring(0, 40);
             p.middleName = male.firstName;
             p.lastName = male.middleName;
             p.gender =  gender == "male" ? true : false;
