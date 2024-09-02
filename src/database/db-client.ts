@@ -13,6 +13,12 @@ export class Db {
         database: "civilDb",
         dialect: "mysql",
         logging: false,
+        pool: {
+            min: 3,
+            max: 8,
+            acquire: 30000,
+            idle: 10000 
+        },
         models: [
             MRecord,
             Person
