@@ -6,39 +6,16 @@ import { GeneratorService } from "./person/generator.service";
 import { Person } from "./person/models/Person";
 
 import { Db } from "./database/db-client";
+import { PersonService } from "./person/person.service";
+import { resolvers } from "./resolvers";
 
 
-/* const resolvers = {
-    Query: {
-        people : () => {
-            const personService: PersonService = PersonService.getInstance();
-            return personService.getAllPersons()
-        },
 
-        someone : (_, args) =>{
-            const personService: PersonService = PersonService.getInstance();
-            return personService.getPersonBySSN(args.ssn)
-        }
-    },
 
-    Mutation: {
-        addNewPerson: (_, args)=>{
-            const personService: PersonService = PersonService.getInstance();
-            return personService.createNewPerson({ ...args.person } as Person);
-        }
-    },
-
-    Person: {
-        siblings: (parent:Person, args)=>{
-            const personService: PersonService = PersonService.getInstance();
-            return personService.getPersonSiblings(parent);
-        }
-    }
-}; */
 
 const server = new ApolloServer({
     typeDefs: schema,
-    //resolvers: resolvers
+    resolvers: resolvers
 });
 
 
@@ -48,11 +25,11 @@ startStandaloneServer(server, {
 .then ( ({ url}) =>{
     console.log(`🚀  Server ready at: ${url}`);
     new Db();
-    setTimeout(()=>{    
+    /* setTimeout(()=>{    
         let genService = new GeneratorService();
         
         genService.populateDB();
 
-    }, 5000);
+    }, 5000); */
 
 })

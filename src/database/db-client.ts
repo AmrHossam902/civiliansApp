@@ -26,7 +26,7 @@ export class Db {
     })
     
     constructor(){
-        this.sequelizeInstance.sync({force: true})
+        this.sequelizeInstance.sync({force: false})
         .then(()=>{
             console.log("sync completed");
         })

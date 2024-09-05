@@ -24,14 +24,14 @@ export class MRecord extends Model{
     @Column(DataType.INTEGER)
     husbandId: number;
 
-    @HasOne(()=> Person)
+    @BelongsTo(()=> Person)
     husband: Person 
 
     @ForeignKey( ()=>Person )
     @Column(DataType.INTEGER)
     wifeId: number;
 
-    @HasOne(()=> Person)
+    @BelongsTo(()=> Person)
     wife: Person;
 
     @Column(DataType.DATE)

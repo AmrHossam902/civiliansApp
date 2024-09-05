@@ -1,6 +1,15 @@
 
 export const schema = `#graphql
 
+
+    type PeoplePage {
+        people: [Person]!
+        firstCursor: String
+        endCursor: String
+        total: Int!
+    }
+
+
     type Person {
         firstName: String!
         lastName: String!
@@ -18,7 +27,6 @@ export const schema = `#graphql
         
         siblings: [Person!]
         parents: [Person!]!
-        grandParents: [Person!]!
     }
 
     type MarriageRecord {
@@ -28,8 +36,11 @@ export const schema = `#graphql
     }
 
     type Query {
-        people: [Person!],
-        someone(ssn: String!): Person 
+        people(
+            after: String,
+            before: String, 
+            sort:[[String!]!], limit: Int): PeoplePage
+        someone(ssn: String!): Person
     }
 
 
@@ -43,8 +54,8 @@ export const schema = `#graphql
         middleName: String!
         gender: Boolean!
         address: String!
-        
         birthDate: String!
     }
+
 
 `
