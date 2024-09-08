@@ -4,5 +4,5 @@ export interface PeoplePage {
     people: Person[],
     firstCursor: String,
     endCursor: String,
-    total: number
+    hasMore: boolean
 }

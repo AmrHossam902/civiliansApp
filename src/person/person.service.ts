@@ -29,18 +29,19 @@ export class PersonService {
             after: string, //json
             before: string, //json
             sort:[string, string][],  // [[first, "ali"], [last, "salem"], [id, "asc"]]
-            limit: number
+            limit: number,
+            filters: Record<string, any>,
+            search: string
         ): Promise<PeoplePage>{
         
-
-        let whereCondition = {}; 
+        let paginationCondition = {}; 
         let cursorObj;
         if(after){
             this.validateCursorParams(after, sort);
             cursorObj = JSON.parse( after );
 
-            whereCondition = {
-                [Op.or]: sort.map(([sortField, dir], index: number)=>{
+            paginationCondition = {
+                [Op.or] : sort.map(([sortField, dir], index: number)=>{
                     let clause = {};
                     for(let i=0; i< index; i++){
                         clause[sort[i][0]] = cursorObj[sort[i][0]];
@@ -59,8 +60,8 @@ export class PersonService {
             this.validateCursorParams(before, sort);
             cursorObj = JSON.parse( before );
 
-            whereCondition = {
-                [Op.or]: sort.map(([sortField, dir], index: number)=>{
+            paginationCondition = {
+                [Op.or] : sort.map(([sortField, dir], index: number)=>{
                     let clause = {};
                     for(let i=0; i< index; i++){
                         clause[sort[i][0]] = cursorObj[sort[i][0]];
@@ -81,40 +82,88 @@ export class PersonService {
             });
         }
 
+        let whereCondition = {};
         
+        //handle filtering & searching
+        //filter by gender
+        //filter by birthdate (range)
+        
+        let filterCondition = {};
+        Object.keys(filters).forEach((key)=>{
+            if(filters[key] != undefined){
+                filterCondition[key] = filters[key];
+            }
+        });
 
-
-
+        //search over first, last , middle
+        let searchCondition = {};
+        if(search)
+        {
+            searchCondition = {
+                [Op.or] : [
+                    {
+                        "firstName" : { [Op.like] : search + "%" }
+                    },
+                    {
+                        "lastName" : { [Op.like] : search + "%" }
+                    },
+                    {
+                        "middleName" : { [Op.like] : search + "%" }
+                    },
+                ],
+            };
+        }
+            
+        whereCondition = {
+            [Op.and]: [
+                filterCondition,
+                searchCondition,
+                paginationCondition
+            ]
+        }
+        console.log(whereCondition);
    
         return Person.findAll({
             where: {
                 ...whereCondition
             },
             order: [...sort],
-            limit: limit,
+            limit: limit + 1,
             logging:true
         })
         .then((people: Person[])=>{
 
             let firstCursor:Record<string,any> = {}, endCursor:Record<string,any> = {};
+            let hasMore: boolean = false;
             
-            if(before)
+            //remove the extra element
+            if(people.length > limit){
+                people.pop();
+                hasMore = true;
+            }
+            
+            //revese the order again in case of before
+            if(before){
                 people = people.reverse();
-
-            sort.forEach( ([field, dir]: [string, string])=>{
+            }
                 
-                firstCursor[field] = people[0][field];
-                endCursor[field] = people[people.length -1][field];
+            //set page cursors
+            if(people.length){
+                sort.forEach( ([field, dir]: [string, string])=>{
                 
-            });
-            firstCursor["id"] = people[0]["id"]; 
-            endCursor["id"] = people[people.length -1]["id"];
+                    firstCursor[field] = people[0][field];
+                    endCursor[field] = people[people.length -1][field];
+                    
+                });
+                firstCursor["id"] = people[0]["id"]; 
+                endCursor["id"] = people[people.length -1]["id"];
+            }
 
             return {
                 people,
                 firstCursor : JSON.stringify(firstCursor),
                 endCursor: JSON.stringify(endCursor),
-                total: 100
+                hasMore
             }
         });
     }

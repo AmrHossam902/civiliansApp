@@ -34,7 +34,7 @@ export class Person extends Model {
 
     @Index({ order: "ASC" , using: "BTREE"})
     @Column(DataType.TINYINT)
-    gender: boolean;
+    gender: number;
 
     @Column(DataType.DATE)
     birthDate: Date;

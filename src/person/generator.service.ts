@@ -80,7 +80,7 @@ export class GeneratorService {
                 p.firstName  = faker.person.firstName(gender).substring(0, 40);
                 p.middleName = faker.person.middleName(gender).substring(0, 40);
                 p.lastName = faker.person.lastName(gender).substring(0, 40);
-                p.gender =  gender == "male" ? true : false;
+                p.gender =  gender == "male"? 1: 0;
                 p.ssn = faker.string.alphanumeric(10);
                 p.address= faker.location.streetAddress({ useFullAddress: true});
                 p.birthDate= faker.date.between(
@@ -275,7 +275,7 @@ export class GeneratorService {
             p.firstName  = faker.person.firstName(gender).substring(0, 40);
             p.middleName = male.firstName;
             p.lastName = male.middleName;
-            p.gender =  gender == "male" ? true : false;
+            p.gender =  gender == "male"? 1: 0;
             p.ssn = faker.string.alphanumeric(10);
             p.father_id = male.id;
             p.mother_id = female.id;

@@ -6,7 +6,7 @@ export const schema = `#graphql
         people: [Person]!
         firstCursor: String
         endCursor: String
-        total: Int!
+        hasMore: Boolean
     }
 
 
@@ -14,7 +14,7 @@ export const schema = `#graphql
         firstName: String!
         lastName: String!
         middleName: String!
-        gender: Boolean!
+        gender: Int!
         address: String!
         
         birthDate: String!
@@ -39,7 +39,10 @@ export const schema = `#graphql
         people(
             after: String,
             before: String, 
-            sort:[[String!]!], limit: Int): PeoplePage
+            sort:[[String!]!], 
+            limit: Int,
+            filter: filter,
+            search: String): PeoplePage
         someone(ssn: String!): Person
     }
 
@@ -52,10 +55,23 @@ export const schema = `#graphql
         firstName: String!
         lastName: String!
         middleName: String!
-        gender: Boolean!
+        gender: Int!
         address: String!
         birthDate: String!
     }
+
+    input DateFilter {
+        from: String!
+        to: String!
+    }
+
+    input filter {
+        gender: Int
+        isAlive: Boolean,
+        birthDate: DateFilter
+
+    }
+
 
 
 `
