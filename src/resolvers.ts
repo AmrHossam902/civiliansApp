@@ -5,6 +5,7 @@ export const resolvers = {
     Query: {
         people : (_, args) => {
             const personService: PersonService = PersonService.getInstance();
+            console.log(args);
             return personService.getAllPeople(args.after, args.before, args.sort, args.limit, args.filter, args.search);
         },
 

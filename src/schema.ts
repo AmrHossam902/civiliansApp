@@ -66,10 +66,14 @@ export const schema = `#graphql
     }
 
     input filter {
-        gender: Int
+        gender: Gender
         isAlive: Boolean,
         birthDate: DateFilter
+    }
 
+    enum Gender {
+        MALE
+        FEMALE
     }
 
 
