@@ -1,6 +1,6 @@
 import { Person } from "../person/models/Person";
 import { Sequelize } from "sequelize-typescript";
-import { MRecord } from "../person/models/MarriageRecord";
+import { MarriageRecord } from "../person/models/MarriageRecord";
 
 
 export class Db {
@@ -20,7 +20,7 @@ export class Db {
             idle: 10000 
         },
         models: [
-            MRecord,
+            MarriageRecord,
             Person
         ]
     })

@@ -2,7 +2,7 @@
 import { faker } from '@faker-js/faker';
 import { Person } from './models/Person';
 import { randomInt, randomUUID } from 'crypto';
-import { MRecord } from './models/MarriageRecord';
+import { MarriageRecord } from './models/MarriageRecord';
 import { NoMalesFound } from './exceptions/noMalesFound.error';
 import { NoFemalesFound } from './exceptions/noFemalesFound.error';
 import { NoPairFound } from './exceptions/noPairFound.error';
@@ -139,7 +139,7 @@ export class GeneratorService {
                 while(true){
                     let [male, female] = this.extractPair(i);    
                 
-                    let mRecord: MRecord = new MRecord();
+                    let mRecord: MarriageRecord = new MarriageRecord();
                     mRecord.publicId = randomUUID();
                     mRecord.husbandId = male.id;
                     mRecord.wifeId = female.id;

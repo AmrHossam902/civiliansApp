@@ -1,4 +1,4 @@
-import { AutoIncrement, BelongsTo, Column, CreatedAt, DataType, ForeignKey, HasOne, Index, Model, PrimaryKey, Table, UpdatedAt } from "sequelize-typescript";
+import { AutoIncrement, BelongsTo, BelongsToMany, Column, CreatedAt, DataType, ForeignKey, HasOne, Index, Model, PrimaryKey, Table, UpdatedAt } from "sequelize-typescript";
 import { Person } from "./Person";
 
 
@@ -9,7 +9,7 @@ import { Person } from "./Person";
     tableName: "marriageRecord",
     freezeTableName: true
 })
-export class MRecord extends Model{
+export class MarriageRecord extends Model{
 
     @PrimaryKey
     @AutoIncrement

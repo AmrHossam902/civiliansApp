@@ -1,38 +1,72 @@
 
 export const schema = `#graphql
 
+    scalar Date 
 
-    type PeoplePage {
-        people: [Person]!
-        firstCursor: String
-        endCursor: String
-        hasMore: Boolean
+    enum Gender {
+        MALE
+        FEMALE
     }
 
-
     type Person {
+        id: ID
         firstName: String!
         lastName: String!
         middleName: String!
-        gender: Int!
+        gender: Gender!
         address: String!
         
-        birthDate: String!
-        deathDate: String 
+        birthDate: Date!
+        deathDate: Date 
         
         ssn: String!
 
-        marriedTo: [Person!]
-        marriageHistory: [MarriageRecord!]
+        marriedTo: [MarriedTo!]
         
         siblings: [Person!]
-        parents: [Person!]!
+        parents: [Person!]
     }
 
+
     type MarriageRecord {
-        husband: Person  
-        wife: Person 
-        type: String!   
+        id: ID
+        type: String! 
+        marriageDate: Date 
+        husband: Person
+        wife: Person
+        children: [Person]
+    }
+
+    type MarriedTo {
+        spouse: Person!
+        children: [Person]
+    }
+
+
+    input PersonData {
+        firstName: String!
+        lastName: String!
+        middleName: String!
+        gender: Gender!
+        address: String!
+        birthDate: String!
+    }
+
+    input DateFilter {
+        from: String!
+        to: String!
+    }
+
+    input filter {
+        gender: Gender
+        isAlive: Boolean,
+        birthDate: DateFilter
+    }
+
+    type PeoplePage {
+        people: [Person]!
+        next: String
+        prev: String
     }
 
     type Query {
@@ -50,32 +84,6 @@ export const schema = `#graphql
     type Mutation {
         addNewPerson(person: PersonData!): String
     } 
-
-    input PersonData {
-        firstName: String!
-        lastName: String!
-        middleName: String!
-        gender: Int!
-        address: String!
-        birthDate: String!
-    }
-
-    input DateFilter {
-        from: String!
-        to: String!
-    }
-
-    input filter {
-        gender: Gender
-        isAlive: Boolean,
-        birthDate: DateFilter
-    }
-
-    enum Gender {
-        MALE
-        FEMALE
-    }
-
 
 
 `
