@@ -1,5 +1,7 @@
 'use client'
-import { useEffect } from "react";
+import { Button, Link, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { Key, useEffect, useRef, useState } from "react";
+import { IoIosPeople } from "react-icons/io";
 
 type Col = {
     key: string;
@@ -42,10 +44,31 @@ type QueryResult = {
     prev: string
 }
 
-export default function allCivilians(){
 
-    const fetchData = ()=>{ 
+enum PageState {
+    IS_LOADING,
+    LOADING_COMPLETE,
+    LOADING_ERROR
+}
+
+export default function AllCivilians(){
     
+    const [data, setData] = useState<Row[]>([]);
+    const [pageState, setPageState] = useState<PageState>(PageState.IS_LOADING);
+  
+    const pagination = useRef<{next: string, prev:string}>({next: "", prev: ""});
+    const sortDescriptor = useRef<SortDescriptor>({column: 'firstName', direction: 'ascending'});
+    
+    const fetchData = (dir: "after" | "before" | "")=>{ 
+        
+        let sortArr:[string, string][] = [];
+        
+        sortDescriptor &&
+          sortArr.push([
+            sortDescriptor.current.column as string, 
+            sortDescriptor.current.direction == "ascending" ? "asc" : "desc" 
+        ]);
+
         fetch("http://localhost:4000/graphql", {
           method: "POST",
           headers: {
@@ -68,17 +91,84 @@ export default function allCivilians(){
               }
           }`,
           variables: {
-            "limit": 10
+            "limit": 10,
+            "after": dir == "after" ? pagination.current.next: "",
+            "before": dir == "before" ? pagination.current.prev: "",
+            "sort": sortArr
           }
           })
         })
         .then( res => res.json())
-        .then( res => console.log(res))
+        .then(data => { 
+            pagination.current.next = data.data.people.next || "";
+            pagination.current.prev = data.data.people.prev || "";
+            setData([...data.data.people.people]); 
+            console.log(data);
+            setPageState(PageState.LOADING_COMPLETE);
+        })
+        .catch( (e)=>{ 
+            setPageState(PageState.LOADING_ERROR); 
+            console.error(e); 
+        });
 
     return <div>all civilians</div>;
     }
 
+    const onSortChange = (sortDesc: SortDescriptor)=>{
+        console.log(sortDesc);
+        sortDescriptor.current = sortDesc;
+        fetchData("");
+    }
+    
+
     useEffect(()=>{
-        fetchData()
-    },[])
+        fetchData("")
+    },[]);
+
+    return <div>
+            <Table 
+                classNames={{ table: "relative",loadingWrapper: "backdrop-blur-sm" }}
+                aria-label="Example static collection table"
+                bottomContent={
+                    <div>
+                        <Button 
+                            onClick={() => fetchData("before")} 
+                            isDisabled={pageState == PageState.IS_LOADING || !pagination.current.prev}
+                        >prev.</Button>
+                        <Button 
+                            onClick={() => fetchData("after")} 
+                            isDisabled={pageState == PageState.IS_LOADING || !pagination.current.next}
+                        >next</Button>
+                    </div>}
+                sortDescriptor={sortDescriptor.current}
+                onSortChange={onSortChange}    
+            >
+            <TableHeader columns={cols}>
+                {(col) => <TableColumn key={col.key} allowsSorting={col.sortable}>{col.key}</TableColumn>}
+            </TableHeader>
+            <TableBody  
+                items={data} 
+                isLoading={pageState == PageState.IS_LOADING} 
+                loadingContent={<Spinner>...loading</Spinner>} >
+                {
+                (row: Row) => {
+                    return <TableRow key= {row.ssn}>{
+                        (colKey: Key) => { 
+                        if(colKey == "family")
+                            return <TableCell>
+                            <Link href={`http://localhost:3000/people/${row["ssn"]}`}>
+                                <IoIosPeople></IoIosPeople>
+                            </Link>
+                            </TableCell>
+
+                        return <TableCell>{row[colKey as keyof Row]}</TableCell>
+                        } 
+                    }</TableRow>;
+                }
+                }
+            </TableBody>
+            </Table>
+    </div>
+
 }
+
