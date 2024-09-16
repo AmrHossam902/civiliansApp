@@ -69,7 +69,7 @@ export const resolvers = {
         wife: (parent: MarriageRecord) =>{
             const personService: PersonService = PersonService.getInstance();
             return personService.getPersonById(parent.wifeId);
-        },
+        }
     },
 
     Date: new GraphQLScalarType({

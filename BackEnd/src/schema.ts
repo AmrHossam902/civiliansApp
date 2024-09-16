@@ -31,15 +31,15 @@ export const schema = `#graphql
     type MarriageRecord {
         id: ID
         type: String! 
-        marriageDate: Date 
-        husband: Person
+        marriageDate: Date
+        husband: Person 
         wife: Person
-        children: [Person]
     }
 
     type MarriedTo {
         spouse: Person!
         children: [Person]
+        marriageRecord: MarriageRecord
     }
 
 
