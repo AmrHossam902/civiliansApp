@@ -61,6 +61,7 @@ export default function AllCivilians(){
     
     const fetchData = (dir: "after" | "before" | "")=>{ 
         
+        setPageState(PageState.IS_LOADING);
         let sortArr:[string, string][] = [];
         
         sortDescriptor &&
