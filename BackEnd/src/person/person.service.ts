@@ -256,6 +256,8 @@ export class PersonService {
                 throw Error("invalid sort direction, use 'asc' or 'desc'");
         });
 
+        sort.push(["id", "asc"]);
+
         return sort;
     }
 

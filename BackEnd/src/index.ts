@@ -1,20 +1,15 @@
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4"
-import { startStandaloneServer } from "@apollo/server/standalone";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
 import express from "express";
 
 import { createServer } from "http";
 import cors from "cors";
 import { schema } from "./schema";
-import { GeneratorService } from "./person/generator.service";
 
-import { Person } from "./person/models/Person";
 
 import { Db } from "./database/db-client";
-import { PersonService } from "./person/person.service";
 import { resolvers } from "./resolvers";
-import { GraphQLScalarType, graphql } from "graphql";
 
 
 async function setup(){
