@@ -23,6 +23,9 @@ export const resolvers = {
 
     Person: {
 
+        id: (parent: Person) => {
+            return parent.publicId;
+        },
         siblings: (parent:Person, args)=>{
             const personService: PersonService = PersonService.getInstance();
             return personService.getPersonSiblings(parent);

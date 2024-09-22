@@ -17,6 +17,10 @@ export class Person extends Model {
     id: number;
 
     @Index({ order: "ASC" , using: "BTREE"})
+    @Column(DataType.STRING(36))
+    publicId
+
+    @Index({ order: "ASC" , using: "BTREE"})
     @Column(DataType.STRING(40) )
     firstName: string;
 
