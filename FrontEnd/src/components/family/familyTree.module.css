@@ -1,0 +1,25 @@
+.person {
+    width: 5em;
+    height: 8em;
+    border-radius: 3px;
+    box-shadow: 0px 0px 10px 6px gray;
+    overflow: hidden;
+}
+
+.image {
+    width: 60%;
+    height: auto;
+    display: block;
+    margin: auto;
+    padding: 10%;
+    overflow: hidden;
+}
+
+.handle {
+    width: 0px;
+    height: 0px;
+    border-width: 0px;
+    background-color: transparent;
+    
+}
+
