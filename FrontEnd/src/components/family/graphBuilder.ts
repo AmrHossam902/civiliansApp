@@ -3,22 +3,11 @@ import { Edge, Node, Position } from "@xyflow/react"
 
 export default class GraphBuilder {
 
-    layers: Layer[];
-    first: Layer;
-    last: Layer;
-
     allNodes: Node[];
     allEdges: Edge[];
 
     constructor(){
-        const l:Layer = { 
-            nodes: [],
-            prev: null,
-            next: null
-        }
-
-        this.first = this.last =l;
-        this.layers = [l];
+ 
         this.allNodes = [];
         this.allEdges = [];
     }
@@ -32,28 +21,14 @@ export default class GraphBuilder {
                 id: p.id!,
                 position: { x: 0, y:0},
                 type: 'person',
+                origin: [0.5, 0.5],
                 data: {
-                    layer: currentLayer
+                    layer: currentLayer,
+                    gender: p.gender, 
+                    name: `${p.firstName} ${p.lastName}`
                 }
             }
             this.allNodes.push(myNode);
-        }
-
-
-        if(p.parents?.length){
-            
-            //build marriage node
-            const marriageNode = this.buildMarriageNode(p.parents[0],p.parents[1], currentLayer-1);
-
-            this.processParents(p.parents, marriageNode, currentLayer);
-
-
-            if(p.siblings?.length){
-                this.processSiblings(p.siblings, marriageNode, currentLayer);
-            }
-
-            this.buildEdge(marriageNode.id, myNode.id);
-
         }
 
 
@@ -75,11 +50,30 @@ export default class GraphBuilder {
            
         }
 
+        if(p.parents?.length){
+            
+            //build marriage node
+            const marriageNode = this.buildMarriageNode(p.parents[0],p.parents[1], currentLayer-1);
+
+            this.processParents(p.parents, marriageNode, currentLayer-2);
+
+
+            if(p.siblings?.length){
+                this.processSiblings(p.siblings, marriageNode, currentLayer);
+            }
+
+            this.buildEdge(marriageNode.id, myNode.id);
+
+        }
+
+
+
 
     }
 
     build(p: Person){
         this.processPerson(p, 0);
+        this.calculateNodePositions();
         console.log(this.allNodes);
         console.log(this.allEdges);
     }
@@ -87,8 +81,8 @@ export default class GraphBuilder {
     processParents(parents: Person[], marriageNode: Node, currentLayer: number){
         
         parents.forEach((p:Person) =>{
-            this.processPerson(parents[0], currentLayer-2);
-            this.processPerson(parents[1], currentLayer-2);
+            this.processPerson(parents[0], currentLayer);
+            this.processPerson(parents[1], currentLayer);
 
             this.buildEdge(p.id!, marriageNode.id);
             
@@ -106,7 +100,7 @@ export default class GraphBuilder {
     processChildren(children: Person[], marriageNode:Node, currentLayer: number){
         
         children.forEach((child: Person)=>{
-            this.processPerson(child, currentLayer + 2);
+            this.processPerson(child, currentLayer );
             this.buildEdge(marriageNode.id, child.id!);
         });
     }
@@ -123,8 +117,8 @@ export default class GraphBuilder {
                 id: edgeId,
                 source: sourceId,
                 target: targetId,
-                sourceHandle: Position.Bottom,
-                targetHandle: Position.Top
+                sourceHandle: 'bottom',
+                targetHandle: 'top'
             });
             
         }
@@ -144,6 +138,7 @@ export default class GraphBuilder {
             id: `M-${Math.ceil(Math.random() * 1_000_000)}`,
             position: { x:0, y:0},
             type: 'marriage',
+            origin: [0.5, 0.5],
             data: {
                 layer,
                 spouseA: person1.id,
@@ -154,6 +149,29 @@ export default class GraphBuilder {
         this.allNodes.push(newNode);
 
         return newNode;
+    }
+
+    calculateNodePositions(){
+
+        let lowestLayer = 0, highestLayer =0;
+        this.allNodes.forEach((node:Node)=>{
+            if(node.data.layer as number > highestLayer)
+                highestLayer = node.data.layer as number
+            else if(node.data.layer as number < lowestLayer)
+                lowestLayer = node.data.layer as number 
+        });
+
+        for(let currentLayer = lowestLayer; currentLayer <= highestLayer; currentLayer++){
+            let layer: Node[] = this.allNodes.filter((node:Node)=>{
+                return node.data.layer as number == currentLayer
+            });
+
+            let xPos = 10;
+            layer.forEach( (node:Node)=>{
+                node.position = { x : xPos, y: currentLayer * 400 }
+                xPos+=150
+            });
+        }
     }
 
 }

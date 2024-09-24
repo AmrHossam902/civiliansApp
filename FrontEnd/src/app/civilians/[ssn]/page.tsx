@@ -51,6 +51,26 @@ export default async function PersonalDetails({ params }: {params: Params}) {
                             parents {
                                 id
                             }
+                            
+                            marriedTo {
+                                spouse {
+                                    id
+                                    firstName
+                                    lastName
+                                    middleName
+                                    ssn
+                                    birthDate
+                                    gender
+                                    parents {
+                                        id
+                                        firstName
+                                        lastName
+                                        gender
+                                        ssn
+                                        birthDate
+                                    }
+                                }
+                            }
                         }
 
                         marriedTo {
@@ -62,6 +82,14 @@ export default async function PersonalDetails({ params }: {params: Params}) {
                                 ssn
                                 birthDate
                                 gender
+                                parents {
+                                    id
+                                    firstName
+                                    lastName
+                                    gender
+                                    ssn
+                                    birthDate
+                                }
                             }
 
                             children {
@@ -90,7 +118,7 @@ export default async function PersonalDetails({ params }: {params: Params}) {
     };
 
     const data = await fetchData();
-
+    console.log(JSON.stringify(data, undefined, "   "));
     const personInfo: Person = data.data.someone; 
 
     return <div className="w-screen h-screen">

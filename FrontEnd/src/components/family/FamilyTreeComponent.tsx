@@ -11,24 +11,7 @@ import Person from '@/interfaces/Person';
 import styles from './familyTree.module.css'
 import GraphBuilder from './graphBuilder';
 
-const initialNodes: Node[] = [
-/*     { 
-        id: '1', 
-        position: { x: 100, y: 0 }, 
-        type: 'person', 
-        data: { label: '1' },
-
-    },
-    */
-    { 
-        id: '2', 
-        position: { x: 200, y: 400 },
-        type: 'person', 
-        data: { 
-            label: '2',
-            gender: 'male' } 
-    } 
-  ];
+const initialNodes: Node[] = [];
   const initialEdges: Edge[] = [/* { id: 'e1-2', source: '1', target: '2' } */];
 
 export default function FamilyTreeComponent({ person }: {person: Person}){
@@ -45,8 +28,12 @@ export default function FamilyTreeComponent({ person }: {person: Person}){
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
     useEffect(()=>{
-        new GraphBuilder()
-        .build(person);
+        let builder = new GraphBuilder();
+        builder.build(person);
+
+        setNodes(builder.allNodes);
+        setEdges(builder.allEdges);
+
     }, []);
 
     return (
@@ -57,6 +44,8 @@ export default function FamilyTreeComponent({ person }: {person: Person}){
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                fitView
+                minZoom={0.01}
                 >
                 <Controls/>
             </ReactFlow>
@@ -67,12 +56,14 @@ export default function FamilyTreeComponent({ person }: {person: Person}){
 
 function PersonNode({data}: any) {
     return <div className={styles.person}>
-            <Image className={styles.image} src={maleAvatar} alt='m-av'></Image>
-            <div ></div>
+            { data.gender == "MALE" && <Image className={styles.image} src={maleAvatar} alt='m-av'></Image>}
+            { data.gender == "FEMALE" && <Image className={styles.image} src={femaleAvatar} alt='m-av'></Image>}
+            <div >
+                {data.name}
+            </div>
 
-            <Handle className={styles.handle} type='target' position={Position.Top}></Handle>
-            <Handle className={styles.handle} type='source' position={Position.Right}></Handle>
-            <Handle className={styles.handle} type='source' position={Position.Left}></Handle>
+            <Handle className={styles.handle} type='target' id="top" position={Position.Top}></Handle>
+            <Handle className={styles.handle} type='source' id="bottom" position={Position.Bottom}></Handle>
         </div>
 }
 
@@ -84,10 +75,9 @@ function MarriageNode() {
             height: "3em",
             border: "2px solid green"
         }}>
-            <Handle type='target' position={Position.Left}></Handle>
-            <Handle type='target' position={Position.Right}></Handle>
+            <Handle type='target' id="top" position={Position.Top}></Handle>   
             marriage
-            <Handle type='source' position={Position.Bottom}></Handle>
+            <Handle type='source' id="bottom" position={Position.Bottom}></Handle>
         </div>
 }
 
