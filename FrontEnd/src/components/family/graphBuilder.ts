@@ -1,10 +1,13 @@
 import Person from "@/interfaces/Person";
-import { Edge, Node, Position } from "@xyflow/react"
+import { Edge, MarkerType, Node, Position, getIncomers, getOutgoers } from "@xyflow/react"
 
 export default class GraphBuilder {
 
     allNodes: Node[];
     allEdges: Edge[];
+
+    readonly horizontalSpacing = 150;
+    readonly verticalSpacing = 300;
 
     constructor(){
  
@@ -73,9 +76,8 @@ export default class GraphBuilder {
 
     build(p: Person){
         this.processPerson(p, 0);
-        this.calculateNodePositions();
-        console.log(this.allNodes);
-        console.log(this.allEdges);
+        const layers:Node[][] = this.segmentNodesIntoLayers();
+        this.organizeNodePositions(layers);
     }
 
     processParents(parents: Person[], marriageNode: Node, currentLayer: number){
@@ -151,7 +153,9 @@ export default class GraphBuilder {
         return newNode;
     }
 
-    calculateNodePositions(){
+    segmentNodesIntoLayers(){
+
+        let layers: Node[][] = [];
 
         let lowestLayer = 0, highestLayer =0;
         this.allNodes.forEach((node:Node)=>{
@@ -168,11 +172,71 @@ export default class GraphBuilder {
 
             let xPos = 10;
             layer.forEach( (node:Node)=>{
-                node.position = { x : xPos, y: currentLayer * 400 }
-                xPos+=150
+                node.position = { x : xPos, y: currentLayer * this.verticalSpacing }
+                xPos += this.horizontalSpacing
             });
+
+            layers.push(layer);
+        }
+
+        return layers;
+    }
+
+    organizeNodePositions(layers:Node[][]){
+        //find densiest layer 
+        let densiestLayerIndex = 0;
+        for(let i=0; i< layers.length; i+=2){
+            if(layers[i].length > layers[densiestLayerIndex].length)
+                densiestLayerIndex = i;
+        }
+
+
+        //organise upwards
+        for(let i=densiestLayerIndex-1; i>0; i-=2){
+            
+            layers[i].forEach((marriageNode: Node)=>{
+                let parents = getIncomers(marriageNode, this.allNodes, this.allEdges);
+                let children = getOutgoers(marriageNode, this.allNodes, this.allEdges);
+
+                let avgX = 0;
+                children.forEach( child => avgX += child.position.x );
+                avgX = Math.ceil(avgX / children.length);
+                marriageNode.position.x = avgX;
+
+                parents[0].position.x = avgX - this.horizontalSpacing / 2;
+                parents[1].position.x = avgX + this.horizontalSpacing / 2;
+
+            })
+                
+        }
+
+
+        //organize downwards
+        for(let i=densiestLayerIndex+1; i < layers.length; i+=2){
+
+            layers[i].forEach((marriageNode: Node)=>{
+                let parents = getIncomers(marriageNode, this.allNodes, this.allEdges);
+                let children = getOutgoers(marriageNode, this.allNodes, this.allEdges);
+
+                let avgX = 0;
+                parents.forEach( parent => avgX += parent.position.x );
+                avgX = Math.ceil( avgX / parents.length);
+                marriageNode.position.x = avgX;
+
+                if(children.length){
+                    const leftMostXPos = avgX - ( (children.length - 1) * this.horizontalSpacing / 2);
+
+                    children.forEach((child:Node, index)=>{
+                        child.position.x = leftMostXPos + (index * this.horizontalSpacing);
+                    })
+
+                }
+            });
+
         }
     }
+
+
 
 }
 
