@@ -1,5 +1,5 @@
 import Person from "@/interfaces/Person";
-import { Edge, MarkerType, Node, Position, getIncomers, getOutgoers } from "@xyflow/react"
+import { Edge, Node, getIncomers, getOutgoers } from "@xyflow/react"
 
 export default class GraphBuilder {
 
@@ -40,7 +40,7 @@ export default class GraphBuilder {
 
                 this.processPerson(marriage.spouse, currentLayer);
                 
-                let marriageNode = this.buildMarriageNode(p, marriage.spouse, currentLayer + 1);
+                const marriageNode = this.buildMarriageNode(p, marriage.spouse, currentLayer + 1);
 
                 this.buildEdge(marriage.spouse.id!, marriageNode.id);
                 this.buildEdge(myNode.id, marriageNode.id);
@@ -78,6 +78,8 @@ export default class GraphBuilder {
         this.processPerson(p, 0);
         const layers:Node[][] = this.segmentNodesIntoLayers();
         this.organizeNodePositions(layers);
+        console.log(layers);
+        console.log(this.allNodes);
     }
 
     processParents(parents: Person[], marriageNode: Node, currentLayer: number){
@@ -110,7 +112,7 @@ export default class GraphBuilder {
     buildEdge(sourceId: string, targetId:string){
 
         const edgeId = `${sourceId}=${targetId}`; 
-        let edge = this.allEdges.find( (edge: Edge) => {
+        const edge = this.allEdges.find( (edge: Edge) => {
             return edge.id == edgeId
         });
 
@@ -155,7 +157,7 @@ export default class GraphBuilder {
 
     segmentNodesIntoLayers(){
 
-        let layers: Node[][] = [];
+        const layers: Node[][] = [];
 
         let lowestLayer = 0, highestLayer =0;
         this.allNodes.forEach((node:Node)=>{
@@ -166,7 +168,7 @@ export default class GraphBuilder {
         });
 
         for(let currentLayer = lowestLayer; currentLayer <= highestLayer; currentLayer++){
-            let layer: Node[] = this.allNodes.filter((node:Node)=>{
+            const layer: Node[] = this.allNodes.filter((node:Node)=>{
                 return node.data.layer as number == currentLayer
             });
 
@@ -195,16 +197,41 @@ export default class GraphBuilder {
         for(let i=densiestLayerIndex-1; i>0; i-=2){
             
             layers[i].forEach((marriageNode: Node)=>{
-                let parents = getIncomers(marriageNode, this.allNodes, this.allEdges);
-                let children = getOutgoers(marriageNode, this.allNodes, this.allEdges);
+                const parents = getIncomers(marriageNode, this.allNodes, this.allEdges);
+                const children = getOutgoers(marriageNode, this.allNodes, this.allEdges);
+                
+                const parentsAvgX = this.calculateAvgX(parents);
+                const childrenAvgX = this.calculateAvgX(children);
 
-                let avgX = 0;
-                children.forEach( child => avgX += child.position.x );
-                avgX = Math.ceil(avgX / children.length);
-                marriageNode.position.x = avgX;
+                if(parentsAvgX > childrenAvgX){
+                    //move marriage node to avgX of parents
+                    marriageNode.position.x = parentsAvgX;
 
-                parents[0].position.x = avgX - this.horizontalSpacing / 2;
-                parents[1].position.x = avgX + this.horizontalSpacing / 2;
+                    //move children and displace all nodes after first child
+                    if(children.length){
+                        const indexOfFIrstChild = layers[i+1].findIndex((n:Node)=> n.id == children[0].id)
+
+                        const displacement = marriageNode.position.x - childrenAvgX;
+
+                        for(let j=indexOfFIrstChild; j< layers[i+1].length; j++){
+                            layers[i+1][j].position.x += displacement;
+                        }
+                    }
+                }
+                else{
+                    //move marriage node to avgX of children
+                    marriageNode.position.x = childrenAvgX;
+                    
+                    //displace parents and all nodes after them in the layer
+                    const indexOfFirstParent = layers[i-1].findIndex((n:Node)=> n.id == parents[0].id);
+
+                    const displacement = marriageNode.position.x - parentsAvgX;
+                    for(let j=indexOfFirstParent; j< layers[i-1].length; j++){
+                        layers[i-1][j].position.x += displacement;
+                    }
+
+
+                }
 
             })
                 
@@ -215,8 +242,8 @@ export default class GraphBuilder {
         for(let i=densiestLayerIndex+1; i < layers.length; i+=2){
 
             layers[i].forEach((marriageNode: Node)=>{
-                let parents = getIncomers(marriageNode, this.allNodes, this.allEdges);
-                let children = getOutgoers(marriageNode, this.allNodes, this.allEdges);
+                const parents = getIncomers(marriageNode, this.allNodes, this.allEdges);
+                const children = getOutgoers(marriageNode, this.allNodes, this.allEdges);
 
                 let avgX = 0;
                 parents.forEach( parent => avgX += parent.position.x );
@@ -236,13 +263,18 @@ export default class GraphBuilder {
         }
     }
 
+    calculateAvgX(nodes: Node[]): number{
+        let avgX = 0;
+        nodes.forEach((n:Node)=>{
+            avgX += n.position.x;
+        });
+        
+        if(nodes.length)
+            avgX = Math.ceil(avgX / nodes.length);
+
+        return avgX;
+    }
 
 
-}
 
-
-type Layer = {
-    nodes: Node[],
-    prev: Layer | null;
-    next: Layer | null;
 }

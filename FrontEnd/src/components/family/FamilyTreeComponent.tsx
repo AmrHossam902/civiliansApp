@@ -5,7 +5,7 @@ import femaleAvatar from "@/assets/female-avatar.png";
 import Image from 'next/image';
  
 import '@xyflow/react/dist/style.css';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import Person from '@/interfaces/Person';
 
 import styles from './familyTree.module.css'
@@ -28,7 +28,7 @@ export default function FamilyTreeComponent({ person }: {person: Person}){
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
     useEffect(()=>{
-        let builder = new GraphBuilder();
+        const builder = new GraphBuilder();
         builder.build(person);
 
         setNodes(builder.allNodes);
@@ -54,7 +54,7 @@ export default function FamilyTreeComponent({ person }: {person: Person}){
 }
 
 
-function PersonNode({data}: any) {
+function PersonNode({data}: {data: {gender: string, name: string}}) {
     return <div className={styles.person}>
             { data.gender == "MALE" && <Image className={styles.image} src={maleAvatar} alt='m-av'></Image>}
             { data.gender == "FEMALE" && <Image className={styles.image} src={femaleAvatar} alt='m-av'></Image>}
