@@ -1,0 +1,19 @@
+.marriageNode {
+    width: 7em;
+    height: 7em;
+    border: solid black 2px;
+    border-radius: 3.5em;
+    text-align: center;
+    padding-top: 2em;
+    font-size: 1.6em;
+    font-weight: bolder;
+}
+
+.handle {
+    width: 0px;
+    height: 0px;
+    border-width: 0px;
+    background-color: transparent;   
+}
+
+
