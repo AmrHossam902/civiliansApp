@@ -1,4 +1,5 @@
 'use client'
+import { SearchComponent } from "@/components/search/searchComponent";
 import { Button, Input, Link, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import { Key, useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
@@ -119,13 +120,13 @@ export default function AllCivilians(){
     return <div>all civilians</div>;
     }
 
-    const onSortChange = (sortDesc: SortDescriptor)=>{
+    function onSortChange(sortDesc: SortDescriptor){
         console.log(sortDesc);
         sortDescriptor.current = sortDesc;
         fetchData("");
     }
 
-    const onSearchChange = (newVal: string)=>{
+    function onSearchChange(newVal: string){
         console.log(newVal);
         searchVal.current = newVal;
         fetchData("");
@@ -140,18 +141,7 @@ export default function AllCivilians(){
                 classNames={{ table: "relative",loadingWrapper: "backdrop-blur-sm" }}
                 aria-label="Example static collection table"
                 topContent={
-                    <div>
-                      <Input
-                        isClearable
-                        type="text"
-                        placeholder="search..."
-                        startContent={
-                          <FaSearch />
-                        }
-                        onValueChange={onSearchChange}
-                      />
-        
-                    </div>
+                    <SearchComponent onChange={onSearchChange}></SearchComponent>
                 }
                 bottomContent={
                     <div>
