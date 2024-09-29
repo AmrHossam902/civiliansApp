@@ -24,14 +24,14 @@ export class MarriageRecord extends Model{
     @Column(DataType.INTEGER)
     husbandId: number;
 
-    @BelongsTo(()=> Person)
+    @BelongsTo(()=> Person, 'husbandId')
     husband: Person 
 
     @ForeignKey( ()=>Person )
     @Column(DataType.INTEGER)
     wifeId: number;
 
-    @BelongsTo(()=> Person)
+    @BelongsTo(()=> Person, 'wifeId')
     wife: Person;
 
     @Column(DataType.DATE)

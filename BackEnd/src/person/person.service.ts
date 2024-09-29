@@ -261,6 +261,11 @@ export class PersonService {
         return sort;
     }
 
+    /**
+     * get all siblings of a person (full sibling / half sibling )
+     * @param p person to get the siblings of
+     * @returns 
+     */
     getPersonSiblings(p: Person): Promise<Person[]> {
 
         let mother_id = p.mother_id ? p.mother_id : "";
@@ -269,6 +274,29 @@ export class PersonService {
         return Person.findAll({
             where: {
                 [Op.or]: [
+                    {
+                        mother_id
+                    },
+                    {
+                        father_id
+                    }
+                ],
+                id: { [Op.not] : p.id }
+            }
+        })
+        .catch(()=>{
+            return [];
+        })
+    }
+
+
+    getPersonFullSiblings(p: Person): Promise<Person[]> {
+        let mother_id = p.mother_id ? p.mother_id : "";
+        let father_id = p.father_id ? p.father_id : "";
+
+        return Person.findAll({
+            where: {
+                [Op.and]: [
                     {
                         mother_id
                     },
@@ -307,7 +335,7 @@ export class PersonService {
 
     marriedTo(p:Person): Promise<MarriedTo[]>{
 
-        let condition = { rType: 1 }; //married not divorce
+        let condition = { rType: 1 }; //marriage not divorce
         if(p.gender == 1)
             condition["husbandId"] = p.id;
         else 
@@ -333,7 +361,8 @@ export class PersonService {
             let response: MarriedTo[] = [];
             records.forEach((record: MarriageRecord) =>{
                 response.push({
-                    spouse: (p.gender == 1) ? record.wife: record.husband
+                    spouse: (p.gender == 1) ? record.wife: record.husband,
+                    marriageDate: record.mDate
                 })
             });
             return response;
@@ -346,8 +375,12 @@ export class PersonService {
 
     getChildren(parent1: Person, parent2: Person):Promise<Person[]>{
 
-        if(parent1.gender == parent2.gender) 
+        if(parent1.gender == parent2.gender){
+            console.log(parent1, parent2);
             throw Error("inappropiate genders for parents");
+        } 
+            
+
 
         let father = parent1.gender == 1 ? parent1: parent2;
         let mother = parent1.gender == 0 ? parent1: parent2;

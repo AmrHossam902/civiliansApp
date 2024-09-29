@@ -9,7 +9,7 @@ type Col = {
     sortable?: boolean;
   }
   
-let cols: Col[]= [
+const cols: Col[]= [
     {
         key: "firstName",
         sortable: true
@@ -39,11 +39,11 @@ type Row = {
     gender: string;
 }
 
-type QueryResult = {
+/* type QueryResult = {
     people: Row[],
     next: string,
     prev: string
-}
+} */
 
 
 enum PageState {
@@ -65,7 +65,7 @@ export default function AllCivilians(){
     const fetchData = (dir: "after" | "before" | "")=>{ 
         
         setPageState(PageState.IS_LOADING);
-        let sortArr:[string, string][] = [];
+        const sortArr:[string, string][] = [];
         
         sortDescriptor &&
           sortArr.push([
@@ -124,8 +124,6 @@ export default function AllCivilians(){
         sortDescriptor.current = sortDesc;
         fetchData("");
     }
-
-
 
     const onSearchChange = (newVal: string)=>{
         console.log(newVal);

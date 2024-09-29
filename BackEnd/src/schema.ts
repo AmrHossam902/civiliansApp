@@ -38,8 +38,8 @@ export const schema = `#graphql
 
     type MarriedTo {
         spouse: Person!
+        marriageDate: Date
         children: [Person]
-        marriageRecord: MarriageRecord
     }
 
 

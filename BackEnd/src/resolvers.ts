@@ -36,10 +36,11 @@ export const resolvers = {
             return personService.getPersonParents(parent);
         },
 
-        marriedTo: (person: Person,_,context) =>{
+        marriedTo: async (person: Person,_,context) =>{
             const personService: PersonService = PersonService.getInstance();
-            context.parent1 = person;
-            return personService.marriedTo(person);
+            const marriageCases: MarriedTo[] = await personService.marriedTo(person);
+            marriageCases.forEach( m => m.parent = person); 
+            return marriageCases;
         },
 
         gender : (parent: Person) =>{
@@ -52,13 +53,11 @@ export const resolvers = {
     },
 
     MarriedTo: {
-        children: (marriedTo: MarriedTo,_, context)=>{
-            let parent1:Person = context.parent1;
+        children: (marriedTo: MarriedTo)=>{
+            let parent1:Person = marriedTo.parent;
             let parent2:Person = marriedTo.spouse;
-            console.log("context: ",context);
             const personService: PersonService = PersonService.getInstance();
             return personService.getChildren(parent1, parent2);
-
         }
     },
 

@@ -1,3 +1,4 @@
+import { marriedTo } from "@/interfaces/MarriedTo";
 import Person from "@/interfaces/Person";
 import { Edge, Node, getIncomers, getOutgoers } from "@xyflow/react"
 
@@ -6,8 +7,8 @@ export default class GraphBuilder {
     allNodes: Node[];
     allEdges: Edge[];
 
-    readonly horizontalSpacing = 150;
-    readonly verticalSpacing = 300;
+    readonly horizontalSpacing = 250;
+    readonly verticalSpacing = 400;
 
     constructor(){
  
@@ -17,7 +18,9 @@ export default class GraphBuilder {
 
 
     private processPerson(p: Person, currentLayer: number){
-
+        if(!p.gender)
+            return;
+        
         let myNode = this.allNodes.find( (n)=> p.id == n.id);
         if(!myNode){
             myNode = {
@@ -28,7 +31,9 @@ export default class GraphBuilder {
                 data: {
                     layer: currentLayer,
                     gender: p.gender, 
-                    name: `${p.firstName} ${p.lastName}`
+                    name: `${p.firstName} ${p.lastName}`,
+                    birthYear : p.birthDate?.split("-")?.[2],
+                    deathYear : p.deathDate ? p.deathDate.split("-")?.[2] : "alive"
                 }
             }
             this.allNodes.push(myNode);
@@ -40,7 +45,11 @@ export default class GraphBuilder {
 
                 this.processPerson(marriage.spouse, currentLayer);
                 
-                const marriageNode = this.buildMarriageNode(p, marriage.spouse, currentLayer + 1);
+                const marriageNode = this.buildMarriageNode(
+                    p, 
+                    marriage.spouse,
+                    marriage.marriageDate.split("-")[2],
+                    currentLayer + 1);
 
                 this.buildEdge(marriage.spouse.id!, marriageNode.id);
                 this.buildEdge(myNode.id, marriageNode.id);
@@ -55,8 +64,13 @@ export default class GraphBuilder {
 
         if(p.parents?.length){
             
+            const mDate = p.parents[0].marriedTo?.find((marriage:marriedTo)=> marriage.spouse.id == p.parents?.[1].id)?.marriageDate; 
             //build marriage node
-            const marriageNode = this.buildMarriageNode(p.parents[0],p.parents[1], currentLayer-1);
+            const marriageNode = this.buildMarriageNode(
+                p.parents[0],
+                p.parents[1],
+                mDate?.split("-")[2]!, 
+                currentLayer-1);
 
             this.processParents(p.parents, marriageNode, currentLayer-2);
 
@@ -85,9 +99,7 @@ export default class GraphBuilder {
     processParents(parents: Person[], marriageNode: Node, currentLayer: number){
         
         parents.forEach((p:Person) =>{
-            this.processPerson(parents[0], currentLayer);
-            this.processPerson(parents[1], currentLayer);
-
+            this.processPerson(p, currentLayer);
             this.buildEdge(p.id!, marriageNode.id);
             
         });
@@ -122,13 +134,17 @@ export default class GraphBuilder {
                 source: sourceId,
                 target: targetId,
                 sourceHandle: 'bottom',
-                targetHandle: 'top'
+                targetHandle: 'top',
+                style:{
+                    stroke: 'black',
+                    strokeWidth: '2px'
+                }
             });
             
         }
     }
 
-    buildMarriageNode(person1: Person, person2: Person, layer: number): Node{
+    buildMarriageNode(person1: Person, person2: Person, marriageYear: string, layer: number): Node{
         
         const foundNode = this.allNodes.find((node) => {
             return node.data.spouseA == person1.id && node.data.spouseB == person2.id ||
@@ -146,7 +162,8 @@ export default class GraphBuilder {
             data: {
                 layer,
                 spouseA: person1.id,
-                spouseB: person2.id
+                spouseB: person2.id,
+                marriageYear
             }
         }
 
@@ -186,15 +203,15 @@ export default class GraphBuilder {
 
     organizeNodePositions(layers:Node[][]){
         //find densiest layer 
-        let densiestLayerIndex = 0;
+/*         let densiestLayerIndex = 0;
         for(let i=0; i< layers.length; i+=2){
             if(layers[i].length > layers[densiestLayerIndex].length)
                 densiestLayerIndex = i;
-        }
+        } */
 
 
         //organise upwards
-        for(let i=densiestLayerIndex-1; i>0; i-=2){
+        for(let i=layers.length-2; i>0; i-=2){
             
             layers[i].forEach((marriageNode: Node)=>{
                 const parents = getIncomers(marriageNode, this.allNodes, this.allEdges);
@@ -238,7 +255,7 @@ export default class GraphBuilder {
         }
 
 
-        //organize downwards
+/*         //organize downwards
         for(let i=densiestLayerIndex+1; i < layers.length; i+=2){
 
             layers[i].forEach((marriageNode: Node)=>{
@@ -260,7 +277,7 @@ export default class GraphBuilder {
                 }
             });
 
-        }
+        } */
     }
 
     calculateAvgX(nodes: Node[]): number{

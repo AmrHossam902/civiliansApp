@@ -1,3 +1,5 @@
+import { marriedTo } from "./MarriedTo";
+
 export default interface Person {
 
     id?: string;
@@ -6,11 +8,12 @@ export default interface Person {
     lastName?: string;
     middleName?: string;
     birthDate?: string;
+    deathDate?: string;
     gender?: string;
 
     siblings?: Person[]
     parents?: Person[]
-    marriedTo?: { spouse: Person, children?: Person[]}[]
+    marriedTo?: marriedTo[]
 
 
 }

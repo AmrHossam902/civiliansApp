@@ -1,6 +1,4 @@
 import FamilyTreeComponent from "@/components/family/FamilyTreeComponent";
-import ClientComponent from "@/components/clientComponent";
-import ServerComponent from "@/components/serverComponent";
 import Person from "@/interfaces/Person";
 
 
@@ -21,32 +19,20 @@ export default async function PersonalDetails({ params }: {params: Params}) {
             body: JSON.stringify({
                 query: `query someone($ssn: String!){
                     someone(ssn: $ssn) {
-                        id
-                        firstName
-                        lastName
-                        middleName
-                        ssn
-                        birthDate
-                        gender
+                        ...personDetails
 
                         parents {
-                            id
-                            firstName
-                            lastName
-                            middleName
-                            ssn
-                            birthDate
-                            gender
+                            ...personDetails
+                            marriedTo{
+                                spouse{
+                                    id
+                                }
+                                marriageDate
+                            }
                         }
 
                         siblings {
-                            id
-                            firstName
-                            lastName
-                            middleName
-                            ssn
-                            birthDate
-                            gender
+                            ...personDetails
 
                             parents {
                                 id
@@ -54,56 +40,48 @@ export default async function PersonalDetails({ params }: {params: Params}) {
                             
                             marriedTo {
                                 spouse {
-                                    id
-                                    firstName
-                                    lastName
-                                    middleName
-                                    ssn
-                                    birthDate
-                                    gender
-                                    parents {
-                                        id
-                                        firstName
-                                        lastName
-                                        gender
-                                        ssn
-                                        birthDate
-                                    }
+                                    ...personDetails
+                                }
+                                marriageDate
+                                children {
+                                    ...personDetails
                                 }
                             }
                         }
 
                         marriedTo {
                             spouse {
-                                id
-                                firstName
-                                lastName
-                                middleName
-                                ssn
-                                birthDate
-                                gender
+                                ...personDetails
                                 parents {
-                                    id
-                                    firstName
-                                    lastName
-                                    gender
-                                    ssn
-                                    birthDate
+                                    ...personDetails
+                                    marriedTo{
+                                        spouse{
+                                            id
+                                        }
+                                        marriageDate
+                                    }
                                 }
                             }
-
+                            marriageDate
                             children {
-                                id
-                                firstName
-                                lastName
-                                middleName
-                                ssn
-                                birthDate
-                                gender
+                                ...personDetails
                             }
                         }
                     }
-                }`,
+                }
+                
+                fragment personDetails on Person {
+                    id
+                    firstName
+                    middleName
+                    lastName
+                    ssn
+                    birthDate
+                    deathDate
+                    gender
+                }
+                
+                `,
                 variables: {
                     ssn:params.ssn
                 }
