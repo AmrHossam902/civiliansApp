@@ -1,5 +1,6 @@
 'use client'
 import { SearchComponent } from "@/components/search/searchComponent";
+import { SideBarComponent } from "@/components/sidebar/sideBarComponent";
 import { Button, Input, Link, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import { Key, useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
@@ -138,7 +139,15 @@ export default function AllCivilians(){
 
     return <div>
             <Table 
-                classNames={{ table: "relative",loadingWrapper: "backdrop-blur-sm" }}
+                classNames={
+                    { 
+                        base: "bg-primary-lighter",
+                        wrapper: "bg-primary-ligher",
+                        th: "bg-primary-light text-primary-darker hover:!text-primary-dark",
+                        table: "relative bg-primary-lighter text-primary-darker",
+                        loadingWrapper: "backdrop-blur-sm" 
+                    }
+                }
                 aria-label="Example static collection table"
                 topContent={
                     <SearchComponent onChange={onSearchChange}></SearchComponent>
@@ -148,11 +157,14 @@ export default function AllCivilians(){
                         <Button 
                             onClick={() => fetchData("before")} 
                             isDisabled={pageState == PageState.IS_LOADING || !pagination.current.prev}
-                        >prev.</Button>
+                            className="bg-secondary text-primary-lighter"
+                        ><strong>prev.</strong></Button>
+                        &nbsp;
                         <Button 
                             onClick={() => fetchData("after")} 
                             isDisabled={pageState == PageState.IS_LOADING || !pagination.current.next}
-                        >next</Button>
+                            className="bg-secondary text-primary-lighter"
+                        > <strong>next</strong> </Button>
                     </div>}
                 sortDescriptor={sortDescriptor.current}
                 onSortChange={onSortChange}    
@@ -182,7 +194,8 @@ export default function AllCivilians(){
                 }
             </TableBody>
             </Table>
-    </div>
+        </div>
+
 
 }
 

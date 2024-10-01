@@ -17,13 +17,27 @@ export function SearchComponent({ onChange }: Props){
 
     return  <div>
                 <Input
-                isClearable
-                type="text"
-                placeholder="search..."
-                startContent={
-                    <FaSearch />
-                }
-                onValueChange={onSearchChange}
+                    isClearable
+                    type="text"
+                    placeholder="search..."
+                    startContent={
+                        <FaSearch />
+                    }
+                    classNames={
+                        {
+                            inputWrapper: [
+                                "bg-primary-lighter",
+                                "!text-primary-darker",
+                                "hover:!bg-primary-light",
+                                "focus-within:!bg-primary-light"
+                            ],
+                            input: [
+                                "placeholder:text-primary-darker",
+                                "!text-primary-darker"
+                            ]
+                        }
+                    }
+                    onValueChange={onSearchChange}
                 />
     </div>
 }

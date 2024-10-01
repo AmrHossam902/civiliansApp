@@ -2,15 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+
+@layer base {
+
+  html[data-theme='themeA']{
+    --primary-lighter: hsl(0 0% 90%);
+    --primary-light: hsl(0 0% 75%);
+    --primary: hsl(0 0% 50%);
+    --primary-dark: hsl(0 0% 30%);
+    --primary-darker: hsl(0 0% 15%);
+    
+    --secondary-lighter: hsl(218 80% 90%);
+    --secondary-light: hsl(218 80% 75%);
+    --secondary: hsl(218 80% 50%);
+    --secondary-dark: hsl(218 80% 30%);
+    --secondary-darker: hsl(218 80% 15%);
+    
+    --success: 120 53%;
+  }
+
+
+  html[data-theme='themeB']{
+
+    --primary-darker: hsl(0 0% 90%);
+    --primary-dark: hsl(0 0% 75%);
+    --primary: hsl(0 0% 50%);
+    --primary-light: hsl(0 0% 30%);
+    --primary-lighter: hsl(0 0% 15%);
+    
+    --secondary-darker: hsl(58 80% 90%);
+    --secondary-dark: hsl(58 80% 75%);
+    --secondary: hsl(58, 80%, 50%);
+    --secondary-light: hsl(58 80% 30%);
+    --secondary-lighter: hsl(58 80% 15%);
+    
+    --success: 120 53%;
+    
+  }
+
+  
+
+
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+
+@layer components {
+  .mainLayout {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(250px, 0.5fr) 1fr 1fr;
   }
+  .sideBar {
+    grid-column: 1 / span 1;
+  }
+
+  .pageContent {
+    grid-column: 2 / span 2;
+    padding: 1em;
+  }
+
 }
+
 

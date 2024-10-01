@@ -11,10 +11,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-      },
-    },
+        primary: {
+          DEFAULT: "var(--primary)",
+          lighter: "var(--primary-lighter)",
+          light: "var(--primary-light)",
+          dark: "var(--primary-dark)",
+          darker: "var(--primary-darker)"
+        },
+        secondary: {
+          DEFAULT: "var(--secondary)",
+          lighter: "var(--secondary-lighter)",
+          light: "var(--secondary-light)",
+          dark: "var(--secondary-dark)",
+          darker: "var(--secondary-darker)"
+        },
+
+      }
+    }
   },
   plugins: [nextui()],
 };
