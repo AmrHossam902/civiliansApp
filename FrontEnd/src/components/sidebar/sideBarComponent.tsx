@@ -3,19 +3,36 @@ import { Listbox, ListboxItem } from "@nextui-org/react";
 import Link from "next/link";
 
 
+const items = [
+    {
+        href:"/civilians",
+        text: "All Civilians",
+    },
+    {
+        href: "/marriage-certificates",
+        text: "Marriage Cases"
+    }
+];
+
+
 export function SideBarComponent(){
 
-    return <div className="bg-primary-background">
-        <Link href="/civilians" key={1}>all civilians</Link>
-        <Link href="/marriage-certificates" key={2}>all certs</Link>
-    </div> 
-    
-    {/* <Listbox>
-            <ListboxItem key={1} >
-                <Link href="/civilians">all civilians</Link>
-            </ListboxItem>
-            <ListboxItem key={2} >
-                <Link href="/marriage-certificates">all certs</Link>
-            </ListboxItem>
-        </Listbox> */};
+    return <Listbox classNames={{
+                base: "p-3"
+            }}>
+            {
+                items.map((item,i)=>{
+                    return <ListboxItem key={i} classNames={{
+                        base: [
+                            "text-primary-darker",
+                            "hover:!bg-secondary-light ",
+                            "focus:!bg-secondary-light "
+                        ],
+
+                    }}>
+                        <Link className="block p-4 font-bold" href={item.href}>{item.text}</Link>
+                    </ListboxItem>
+                })
+            }
+        </Listbox>;
 }
