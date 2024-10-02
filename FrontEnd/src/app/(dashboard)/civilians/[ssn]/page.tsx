@@ -99,7 +99,7 @@ export default async function PersonalDetails({ params }: {params: Params}) {
     console.log(JSON.stringify(data, undefined, "   "));
     const personInfo: Person = data.data.someone; 
 
-    return <div className="w-screen h-screen">
+    return <div className="w-full h-full">
         <FamilyTreeComponent person={personInfo}></FamilyTreeComponent>
     </div>
 

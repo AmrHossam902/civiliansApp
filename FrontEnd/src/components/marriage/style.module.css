@@ -1,12 +1,13 @@
 .marriageNode {
     width: 7em;
     height: 7em;
-    border: solid black 2px;
+    border: solid var(--primary-darker) 2px;
     border-radius: 3.5em;
     text-align: center;
     padding-top: 2em;
     font-size: 1.6em;
     font-weight: bolder;
+    color: var(--primary-darker);
 }
 
 .handle {

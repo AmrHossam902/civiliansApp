@@ -20,7 +20,7 @@ export default class GraphBuilder {
     private processPerson(p: Person, currentLayer: number){
         if(!p.gender)
             return;
-        
+
         let myNode = this.allNodes.find( (n)=> p.id == n.id);
         if(!myNode){
             myNode = {
@@ -136,7 +136,7 @@ export default class GraphBuilder {
                 sourceHandle: 'bottom',
                 targetHandle: 'top',
                 style:{
-                    stroke: 'black',
+                    stroke: 'var(--primary-darker)',
                     strokeWidth: '2px'
                 }
             });

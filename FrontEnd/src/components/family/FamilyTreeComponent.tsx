@@ -10,6 +10,8 @@ import GraphBuilder from './graphBuilder';
 import { MarriageComponent } from '../marriage/MarriageComponent';
 import { PersonComponent } from '../person/PersonComponent';
 
+import styles from './familyTree.module.css';
+
 const initialNodes: Node[] = [];
   const initialEdges: Edge[] = [/* { id: 'e1-2', source: '1', target: '2' } */];
 
@@ -36,14 +38,14 @@ export default function FamilyTreeComponent({ person }: {person: Person}){
     }, []);
 
     return (
-        <div className='w-4/5 h-4/5 m-auto'>
+        <div className={styles.flowContainer}>
             <ReactFlow 
                 nodeTypes={nodeTypes}
                 nodes={nodes} 
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
-                fitView
+                onInit={(instance)=> instance.fitView() }
                 minZoom={0.01}
                 >
                 <Controls/>

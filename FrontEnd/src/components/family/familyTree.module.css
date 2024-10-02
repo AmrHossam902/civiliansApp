@@ -1,0 +1,10 @@
+.flowContainer {
+    @apply w-4/5 
+            h-4/5 
+            m-auto 
+            border-solid 
+            border-primary-darker 
+            border-2
+            rounded-lg
+            overflow-hidden
+}
