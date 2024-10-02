@@ -30,14 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary-lighter`}>
           <NextUIProvider>
-            <div className="mainLayout">
-              <div className="sideBar">
-                <SideBarComponent></SideBarComponent>
-              </div>
-              <div className="pageContent">
-                {children}  
-              </div>
-            </div>
+            {children}
           </NextUIProvider>
       </body>
     </html>

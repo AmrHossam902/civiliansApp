@@ -1,38 +1,45 @@
-'use client';
-import { Listbox, ListboxItem } from "@nextui-org/react";
+"use client";
 import Link from "next/link";
+import styles from './sidebar-styles.module.css';
+import { useState } from "react";
+import { GoPeople } from "react-icons/go";
+import { PiCertificateLight } from "react-icons/pi";
 
 
 const items = [
     {
         href:"/civilians",
         text: "All Civilians",
+        icon: <GoPeople></GoPeople>
     },
     {
         href: "/marriage-certificates",
-        text: "Marriage Cases"
+        text: "Marriage Cases",
+        icon: <PiCertificateLight></PiCertificateLight>
     }
 ];
 
 
 export function SideBarComponent(){
 
-    return <Listbox classNames={{
-                base: "p-3"
-            }}>
+    const[activeItem, setActiveItem] = useState(()=>{
+        return items.findIndex((item)=> item.href == window.location.pathname )
+    });
+
+
+
+    return <div className={styles.list}>
             {
                 items.map((item,i)=>{
-                    return <ListboxItem key={i} classNames={{
-                        base: [
-                            "text-primary-darker",
-                            "hover:!bg-secondary-light ",
-                            "focus:!bg-secondary-light "
-                        ],
-
-                    }}>
-                        <Link className="block p-4 font-bold" href={item.href}>{item.text}</Link>
-                    </ListboxItem>
+                    return <Link 
+                            className={`${styles.listItem} ${activeItem == i? styles.active: ""}`} 
+                            href={item.href}
+                            onClick={()=>setActiveItem(i)}
+                            key={i}
+                            >
+                        <div className="inline-block align-text-top">{item.icon}</div> {item.text}
+                    </Link> 
                 })
             }
-        </Listbox>;
+    </div> 
 }

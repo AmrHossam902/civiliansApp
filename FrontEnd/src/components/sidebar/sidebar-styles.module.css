@@ -1,0 +1,19 @@
+.list {
+    border-right: solid 1px var(--primary);
+    box-shadow: 0px 0px 14px 2px var(--primary);
+    height: 100%;
+    padding: 1em;
+}
+
+.listItem {
+    @apply block p-3 
+            text-lg
+            text-primary-darker 
+            hover:text-secondary-light 
+            focus:!font-black 
+            focus:!text-primary-darker
+}
+
+.active {
+    @apply font-black;
+}

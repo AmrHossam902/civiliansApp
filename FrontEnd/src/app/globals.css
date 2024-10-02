@@ -40,28 +40,6 @@
     
   }
 
-  
-
-
-}
-
-
-@layer components {
-  .mainLayout {
-    width: 100vw;
-    height: 100vh;
-    display: grid;
-    grid-template-columns: minmax(250px, 0.5fr) 1fr 1fr;
-  }
-  .sideBar {
-    grid-column: 1 / span 1;
-  }
-
-  .pageContent {
-    grid-column: 2 / span 2;
-    padding: 1em;
-  }
-
 }
 
 

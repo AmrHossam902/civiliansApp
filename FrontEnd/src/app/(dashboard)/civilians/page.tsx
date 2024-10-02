@@ -1,7 +1,8 @@
 'use client'
 import { SearchComponent } from "@/components/search/searchComponent";
 import { SideBarComponent } from "@/components/sidebar/sideBarComponent";
-import { Button, Input, Link, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { Button, Input, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import  Link  from 'next/link';
 import { Key, useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { IoIosPeople } from "react-icons/io";
