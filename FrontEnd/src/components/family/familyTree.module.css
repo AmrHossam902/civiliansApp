@@ -1,10 +1,18 @@
+
+.pageContainer {
+    @apply w-4/5
+            h-full
+            m-auto
+}
+
 .flowContainer {
-    @apply w-4/5 
+    @apply w-full 
             h-4/5 
-            m-auto 
             border-solid 
             border-primary-darker 
             border-2
             rounded-lg
             overflow-hidden
+            mb-8
+            bg-primary-lighter
 }
