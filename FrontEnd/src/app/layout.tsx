@@ -3,6 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { SideBarComponent } from "@/components/sidebar/sideBarComponent";
+import { useState } from "react";
+import { AppContainerComponent } from "@/components/appContainer/AppContainerComponent";
+import { ThemeProvider } from "@/providers/themeProvider";
+import { ProvidersContainer } from "@/providers/providersContainer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,13 +29,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
-    <html lang="en" data-theme="themeA">
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary-lighter`}>
-          <NextUIProvider>
-            {children}
-          </NextUIProvider>
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <ProvidersContainer>
+            <AppContainerComponent>
+                {children}
+            </AppContainerComponent>
+          </ProvidersContainer>
       </body>
     </html>
   );

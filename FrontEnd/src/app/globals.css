@@ -5,7 +5,7 @@
 
 @layer base {
 
-  html[data-theme='themeA']{
+  div[data-theme='themeA']{
     --primary-lighter: hsl(0 0% 90%);
     --primary-light: hsl(0 0% 75%);
     --primary: hsl(0 0% 50%);
@@ -22,7 +22,7 @@
   }
 
 
-  html[data-theme='themeB']{
+  div[data-theme='themeB']{
 
     --primary-darker: hsl(0 0% 90%);
     --primary-dark: hsl(0 0% 75%);
