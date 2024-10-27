@@ -3,6 +3,7 @@ import { Person } from "./person/models/Person";
 import { PersonService } from "./person/person.service";
 import { MarriageRecord } from "./person/models/MarriageRecord";
 import { MarriedTo } from "./person/interfaces/marriedTo.interface";
+import { MarriageReadErrorType, MarriageReadError } from "./person/exceptions/marriageRead.error";
 
 export const resolvers = {
     Query: {
@@ -17,6 +18,40 @@ export const resolvers = {
         someone : (_, args) =>{
             const personService: PersonService = PersonService.getInstance();
             return personService.getPersonBySSN(args.ssn)
+        },
+
+        marriage : async (_, args) =>{
+            const personService: PersonService = PersonService.getInstance();
+            const husband = await personService.getPersonBySSN(args.maleNatId);
+            if(!husband)
+                throw new MarriageReadError(
+                    MarriageReadErrorType.HUSBAND_NOT_FOUND,
+                    `can not find a person with this National Id ${args.maleNatId}`
+                );
+
+            const wife = await personService.getPersonBySSN(args.femaleNatId);
+            if(!wife)
+                throw new MarriageReadError(
+                    MarriageReadErrorType.WIFE_NOT_FOUND,
+                    `can not find a person with this National Id ${args.femaleNatId}`
+                );
+
+            return personService.getMarriageRecord(husband.id, wife.id)
+            .then((marriageCase: MarriageRecord)=>{
+                
+                if(!marriageCase)
+                    throw new MarriageReadError(
+                        MarriageReadErrorType.MARRIAGE_CASE_NOT_FOUND,
+                        `no marriage case found for these 
+                        people with national ids ${args.maleNatId} 
+                        & ${args.femaleNatId}`
+                    );
+
+                marriageCase.husband = husband;
+                marriageCase.wife = wife;
+
+                return marriageCase;
+            })
         }
 
     },
@@ -63,6 +98,10 @@ export const resolvers = {
 
     MarriageRecord: {
         
+        id: (parent: MarriageRecord) => {
+            return parent.publicId;
+        },
+
         husband: (parent: MarriageRecord) =>{
             const personService: PersonService = PersonService.getInstance();
             return personService.getPersonById(parent.husbandId);
@@ -71,6 +110,11 @@ export const resolvers = {
         wife: (parent: MarriageRecord) =>{
             const personService: PersonService = PersonService.getInstance();
             return personService.getPersonById(parent.wifeId);
+        },
+
+        children: (parent: MarriageRecord) =>{
+            const personService: PersonService = PersonService.getInstance();
+            return personService.getChildren(parent.husband, parent.wife);
         }
     },
 
@@ -91,14 +135,15 @@ export const resolvers = {
             throw Error("invalid date format, input can't be converted")
         }
 
-    })
+    }),
 
-/*     Mutation: {
-        addNewPerson: (_, args)=>{
+    Mutation: {
+        addNewPerson: (_, args: Person)=>{
             const personService: PersonService = PersonService.getInstance();
-            return personService.createNewPerson({ ...args.person } as Person);
+            console.log(args);
+            return true;//personService.createNewPerson({ ...args } as Person);
         }
-    }, */
+    }
 
 
 };

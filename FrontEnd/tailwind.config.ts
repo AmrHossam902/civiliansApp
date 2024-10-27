@@ -13,10 +13,12 @@ const config: Config = {
       colors: {
         primary: {
           DEFAULT: "var(--primary)",
+          lightest: "var(--primary-lightest)",
           lighter: "var(--primary-lighter)",
           light: "var(--primary-light)",
           dark: "var(--primary-dark)",
-          darker: "var(--primary-darker)"
+          darker: "var(--primary-darker)",
+          darkest: "var(--primary-darkest)"
         },
         secondary: {
           DEFAULT: "var(--secondary)",

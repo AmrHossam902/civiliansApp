@@ -1,0 +1,64 @@
+
+.textInput[data-slot='base']{
+    @apply w-[20em]
+}
+
+.textInput [data-slot='label']{
+    @apply !text-primary-darkest
+}
+
+.textInput [data-slot='input-wrapper']{
+
+    @apply  bg-primary-lightest
+            border-primary
+            text-primary
+}
+
+.textInput[data-focus] [data-slot='input-wrapper']{
+    @apply  focus-within:!border-secondary
+            focus-within:!shadow-[0px_0px_4px_1px]
+            focus-within:!shadow-secondary
+}
+
+.textInput[data-invalid] [data-slot='input-wrapper']{
+    @apply  !border-danger
+            !shadow-[0px_0px_4px_1px]
+            !shadow-danger
+}
+
+
+.textInput [data-slot='input']{
+    @apply  placeholder:text-primary
+            !text-primary-darker
+}
+
+
+.dateInput[data-slot='base']{
+    @apply !w-[20em];
+}
+
+.dateInput > [data-slot='input-wrapper'] {
+    @apply  bg-primary-lightest
+            border-primary
+            focus-within:!border-secondary
+            focus-within:!shadow-[0px_0px_4px_1px]
+            focus-within:!shadow-secondary
+}
+
+.dateInput[data-invalid] > [data-slot='input-wrapper'] {
+    @apply  border-danger
+            shadow-[0px_0px_4px_1px]
+            shadow-danger
+}
+
+.dateInput > [data-slot='label'] {
+    @apply !text-primary-darkest
+}
+
+.dateInput [data-placeholder] {
+    @apply  !text-primary
+}
+
+.dateInput [data-slot='segment'] {
+    @apply  text-primary-darker
+}

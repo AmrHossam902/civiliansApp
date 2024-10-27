@@ -1,5 +1,5 @@
-import { marriedTo } from "@/interfaces/MarriedTo";
-import Person from "@/interfaces/Person";
+import { marriedTo } from "@/dtos/MarriedTo";
+import Person from "@/dtos/Person";
 import { Edge, Node, getIncomers, getOutgoers } from "@xyflow/react"
 
 export default class GraphBuilder {

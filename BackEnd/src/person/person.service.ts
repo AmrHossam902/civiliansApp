@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { Person } from "./models/Person";
 import { PeoplePage } from "./interfaces/PeoplePage.interface";
 import { MarriageRecord } from "./models/MarriageRecord";
@@ -134,6 +134,39 @@ export class PersonService {
                     {
                         "middleName" : { [Op.like] : search + "%" }
                     },
+                    {
+                        "ssn" : { [Op.like] : search + "%" }
+                    },
+                    {
+                        "firstAndLastNameQuery" : Sequelize.where(
+                            Sequelize.fn(
+                                'concat', 
+                                Sequelize.col("firstName"),
+                                " ",
+                                Sequelize.col("lastName")
+                            )
+                            , 
+                            {
+                                [Op.like] : search + "%"
+                            }
+                        )
+                    },
+                    {
+                        "fullNameQuery" : Sequelize.where(
+                            Sequelize.fn(
+                                'concat', 
+                                Sequelize.col("firstName"),
+                                " ",
+                                Sequelize.col("middleName"),
+                                " ",
+                                Sequelize.col("lastName")
+                            )
+                            , 
+                            {
+                                [Op.like] : search + "%"
+                            }
+                        )
+                    }
                 ],
             };
         }
@@ -394,5 +427,15 @@ export class PersonService {
         .catch((e)=>{ console.error(e); return []})
     }
     
+    getMarriageRecord(maleId: number, femaleId: number){
+        return MarriageRecord.findOne({
+            where: {
+                husbandId: maleId,
+                wifeId: femaleId,
+                rtype: 1 //marriage
+            },
+        })
+       .catch(()=>{ return null })
+    }
 
 }

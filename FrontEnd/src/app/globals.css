@@ -5,12 +5,14 @@
 
 @layer base {
 
-  div[data-theme='themeA']{
+  html:has(div [data-theme='themeA']){
+    --primary-lightest: hsl(0 0% 100);
     --primary-lighter: hsl(0 0% 90%);
     --primary-light: hsl(0 0% 75%);
     --primary: hsl(0 0% 50%);
     --primary-dark: hsl(0 0% 30%);
     --primary-darker: hsl(0 0% 15%);
+    --primary-darkest: hsl(0 0% 0%);
     
     --secondary-lighter: hsl(218 80% 90%);
     --secondary-light: hsl(218 80% 75%);
@@ -22,13 +24,15 @@
   }
 
 
-  div[data-theme='themeB']{
+  html:has(div [data-theme='themeB']){
 
+    --primary-darkest: hsl(0 0% 100%);
     --primary-darker: hsl(0 0% 90%);
     --primary-dark: hsl(0 0% 75%);
     --primary: hsl(0 0% 50%);
     --primary-light: hsl(0 0% 30%);
     --primary-lighter: hsl(0 0% 15%);
+    --primary-lightest: hsl(0 0% 0%);
     
     --secondary-darker: hsl(58 80% 90%);
     --secondary-dark: hsl(58 80% 75%);

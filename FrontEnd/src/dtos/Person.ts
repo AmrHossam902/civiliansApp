@@ -10,7 +10,7 @@ export default interface Person {
     birthDate?: string;
     deathDate?: string;
     gender?: string;
-
+    ssn?: string;
     siblings?: Person[]
     parents?: Person[]
     marriedTo?: marriedTo[]

@@ -15,7 +15,7 @@ const items = [
     },
     {
         href: "/marriage-certificates",
-        text: "Marriage Cases",
+        text: "Marriage Certificates",
         icon: <PiCertificateLight></PiCertificateLight>
     }
 ];

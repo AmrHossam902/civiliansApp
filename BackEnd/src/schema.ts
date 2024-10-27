@@ -31,9 +31,10 @@ export const schema = `#graphql
     type MarriageRecord {
         id: ID
         type: String! 
-        marriageDate: Date
-        husband: Person 
-        wife: Person
+        mDate: Date
+        husband: Person! 
+        wife: Person!
+        children: [Person]
     }
 
     type MarriedTo {
@@ -78,6 +79,7 @@ export const schema = `#graphql
             filter: filter,
             search: String): PeoplePage
         someone(ssn: String!): Person
+        marriage(maleNatId: String!, femaleNatId: String!): MarriageRecord
     }
 
 

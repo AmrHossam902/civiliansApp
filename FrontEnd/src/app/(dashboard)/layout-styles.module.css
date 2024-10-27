@@ -10,6 +10,7 @@
 }
 
 .pageContent {
+    overflow-y: auto;
     grid-column: 2 / span 2;
     padding: 2em;
 }

@@ -1,0 +1,15 @@
+
+button[data-loading] {
+    @apply !text-primary-darker
+            !opacity-100
+}
+
+.popover {
+    @apply bg-primary-lightest text-primary-darker
+            !shadow-[0px_0px_8px_1px]
+            !shadow-primary-darker
+}
+
+.popover [data-slot='empty-content'] {
+    @apply text-primary-darkest 
+}

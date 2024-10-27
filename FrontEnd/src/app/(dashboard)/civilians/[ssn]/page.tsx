@@ -1,5 +1,5 @@
 import FamilyTreeComponent from "@/components/family/FamilyTreeComponent";
-import Person from "@/interfaces/Person";
+import Person from "@/dtos/Person";
 
 
 type Params = {

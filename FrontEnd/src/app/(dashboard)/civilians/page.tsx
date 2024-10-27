@@ -139,6 +139,16 @@ export default function AllCivilians(){
     },[]);
 
     return <div>
+
+            <div className="mb-4">
+                <Button 
+                    className="inline-block p-2 bg-secondary text-primary-lighter rounded-xl text-center"
+                    href={`http://localhost:3000/civilians/new`}
+                    as={Link}
+                    >create
+                </Button>
+            </div>
+
             <Table 
                 classNames={
                     { 
