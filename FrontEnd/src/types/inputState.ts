@@ -1,7 +1,8 @@
+import Person from "@/dtos/Person";
 import { DateValue } from "@nextui-org/react"
 
 type InputState = {
-    value: string | DateValue | null,
+    value: Person | string | DateValue | null,
     isValid: boolean,
     errorMessage: string,
     isTouched: boolean

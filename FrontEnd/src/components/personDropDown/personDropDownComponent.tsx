@@ -8,11 +8,11 @@ import "./personDropDown.styles.css";
 
 type Props = {
     label: string;
-    setSelectedPerson: (p?:Person)=>void,
+    setSelectedPerson: (p?: Person) => void,
     inputState: InputState,
-    setInputState: (input: InputState)=>void
-    onInputBlur: ()=>void,
-    onInputChange: (v: string)=>void
+    setInputState: (input: InputState) => void
+    onInputBlur: () => void,
+    onInputChange: (v: string) => void
 }
 
 export function PersonDropDownComponent({
@@ -22,7 +22,7 @@ export function PersonDropDownComponent({
     setInputState,
     onInputBlur,
     onInputChange
-}: Props){
+}: Props) {
 
     const peopleFetchTimeout = useRef<NodeJS.Timeout>();
 
@@ -30,12 +30,12 @@ export function PersonDropDownComponent({
     const [dropdownItems, setDropdownItems] = useState<Person[]>([]);
 
 
-    const getPerson = useCallback((search: string) =>{
+    const getPerson = useCallback((search: string) => {
 
         return fetch("http://localhost:4000/graphql", {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+                "Content-Type": "application/json"
             },
             cache: 'no-cache',
             body: JSON.stringify({
@@ -60,37 +60,37 @@ export function PersonDropDownComponent({
             })
         })
 
-    },[]);
+    }, []);
 
 
-    const onKeyUp = useCallback((e: any)=>{
+    const onKeyUp = useCallback((e: any) => {
         e.continuePropagation();
 
         console.log(inputState.value);
         setDropdownItems([]);
 
-        if(inputState.value){
+        if (inputState.value) {
             setIsLoading(true);
             clearTimeout(peopleFetchTimeout.current);
-            peopleFetchTimeout.current = setTimeout(()=> {
+            peopleFetchTimeout.current = setTimeout(() => {
                 getPerson(inputState.value as string)
-                .then((res)=> res.json())
-                .then((res)=> { 
-                    setIsLoading(false);
-                    console.log(res)
-                    if(!res.errors){
-                        setDropdownItems([ ...res.data.people.people]);
-                    }
-                })
-                .catch((err)=> {console.error(err)});
+                    .then((res) => res.json())
+                    .then((res) => {
+                        setIsLoading(false);
+                        console.log(res)
+                        if (!res.errors) {
+                            setDropdownItems([...res.data.people.people]);
+                        }
+                    })
+                    .catch((err) => { console.error(err) });
 
             }, 1000);
         }
-        else{
+        else {
             clearTimeout(peopleFetchTimeout.current);
             setIsLoading(false);
         }
-    },[inputState]);
+    }, [inputState]);
 
     return <Autocomplete
         classNames={{
@@ -109,11 +109,11 @@ export function PersonDropDownComponent({
         inputValue={inputState.value as string}
         onInputChange={onInputChange}
         onKeyUp={onKeyUp}
-        onSelectionChange={(key)=>{
+        onSelectionChange={(key) => {
 
-            const selectedPerson = dropdownItems.find((item)=> item.id == key);
+            const selectedPerson = dropdownItems.find((item) => item.id == key);
             setSelectedPerson(selectedPerson);
-            
+
         }}
 
         listboxProps={{
@@ -126,7 +126,7 @@ export function PersonDropDownComponent({
         onBlur={onInputBlur}
     >
         {
-            (item:Person) => (
+            (item: Person) => (
                 <AutocompleteItem key={item.id as string} textValue={`${item.firstName} ${item.middleName} ${item.lastName}`}>
                     <div>
                         <h2>{`${item.firstName} ${item.middleName} ${item.lastName}`}</h2>

@@ -17,6 +17,11 @@ export class PersonService {
 
     private constructor(){}
 
+
+    createNewPerson(personData: Partial<Person>){
+        return Person.create(personData);
+    }
+
     getPersonById(id: number): Promise<Person>{
         return Person.findOne({
             where: {

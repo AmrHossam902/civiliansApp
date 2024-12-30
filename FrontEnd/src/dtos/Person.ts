@@ -14,6 +14,4 @@ export default interface Person {
     siblings?: Person[]
     parents?: Person[]
     marriedTo?: marriedTo[]
-
-
 }

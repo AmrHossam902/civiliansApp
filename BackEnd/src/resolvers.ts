@@ -4,6 +4,8 @@ import { PersonService } from "./person/person.service";
 import { MarriageRecord } from "./person/models/MarriageRecord";
 import { MarriedTo } from "./person/interfaces/marriedTo.interface";
 import { MarriageReadErrorType, MarriageReadError } from "./person/exceptions/marriageRead.error";
+import genderPipe from "./person/pipes/gender.pipe";
+import { faker } from "@faker-js/faker";
 
 export const resolvers = {
     Query: {
@@ -12,7 +14,14 @@ export const resolvers = {
             const personService: PersonService = PersonService.getInstance();
             console.log(args);
             
-            return personService.getAllPeople(args.after, args.before, args.sort, args.limit, args.filter, args.search);
+            return personService.getAllPeople(
+                args.after, 
+                args.before, 
+                args.sort, 
+                args.limit, 
+                genderPipe(args.filter), 
+                args.search
+            );
         },
 
         someone : (_, args) =>{
@@ -118,6 +127,29 @@ export const resolvers = {
         }
     },
 
+    Mutation: {
+        addNewPerson: async (_, { person }: any)=>{
+            const personService: PersonService = PersonService.getInstance();
+            const father = await personService.getPersonBySSN(person.fatherSSN);
+            const mother = await personService.getPersonBySSN(person.motherSSN);
+
+            const p: Partial<Person> = {
+                firstName: person.firstName,
+                lastName: person.lastName,
+                middleName: person.middleName,
+                ssn: faker.string.alphanumeric(10), 
+                gender: genderPipe(person.gender).gender,
+                birthDate: person.birthDate,
+                address: person.address,
+                father_id: father.id,
+                mother_id: mother.id
+            };
+            console.log(p);
+
+            return personService.createNewPerson(p);
+        }
+    },
+
     Date: new GraphQLScalarType({
         name: "Date",
         description: "JS date type for GQL",
@@ -137,13 +169,7 @@ export const resolvers = {
 
     }),
 
-    Mutation: {
-        addNewPerson: (_, args: Person)=>{
-            const personService: PersonService = PersonService.getInstance();
-            console.log(args);
-            return true;//personService.createNewPerson({ ...args } as Person);
-        }
-    }
+
 
 
 };

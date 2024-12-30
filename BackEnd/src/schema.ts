@@ -44,15 +44,6 @@ export const schema = `#graphql
     }
 
 
-    input PersonData {
-        firstName: String!
-        lastName: String!
-        middleName: String!
-        gender: Gender!
-        address: String!
-        birthDate: String!
-    }
-
     input DateFilter {
         from: String!
         to: String!
@@ -84,8 +75,19 @@ export const schema = `#graphql
 
 
     type Mutation {
-        addNewPerson(person: PersonData!): String
+        addNewPerson(person: PersonData!): Person
     } 
+
+    input PersonData {
+        firstName: String!
+        lastName: String!
+        middleName: String!
+        gender: Gender!
+        address: String!
+        birthDate: String!
+        fatherSSN: String!
+        motherSSN: String!
+    }
 
 
 `
