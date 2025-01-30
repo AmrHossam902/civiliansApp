@@ -1,3 +1,4 @@
+import { Gender } from "@/types/gender";
 import { marriedTo } from "./MarriedTo";
 
 export default interface Person {
@@ -9,7 +10,7 @@ export default interface Person {
     middleName?: string;
     birthDate?: string;
     deathDate?: string;
-    gender?: string;
+    gender?: Gender;
     ssn?: string;
     siblings?: Person[]
     parents?: Person[]

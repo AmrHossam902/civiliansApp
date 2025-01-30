@@ -8,7 +8,7 @@ export function getPeople(search: string, filter: Record<string, any>) {
             },
             cache: 'no-cache',
             body: JSON.stringify({
-                query: `query people($limit: Int, $search: String, $filter: filter){
+                query: `query people($limit: Int, $search: String, $filter: FilterInput){
                     people(search: $search, limit: $limit, filter: $filter) {
                         people {
                             id
@@ -43,7 +43,7 @@ export function createNewPerson(person:any){
         },
         cache: 'no-cache',
         body: JSON.stringify({
-            query: `mutation AddNewPerson($person: PersonData!) {
+            query: `mutation AddNewPerson($person: CreatePersonInput!) {
                         addNewPerson(person: $person){
                             id
                         }
