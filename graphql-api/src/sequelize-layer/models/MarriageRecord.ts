@@ -1,5 +1,8 @@
-import { AutoIncrement, BelongsTo, BelongsToMany, Column, CreatedAt, DataType, ForeignKey, HasOne, Index, Model, PrimaryKey, Table, UpdatedAt } from "sequelize-typescript";
+import { AfterFind, AutoIncrement, BeforeCreate, BeforeFind, BelongsTo, BelongsToMany, Column, CreatedAt, DataType, ForeignKey, HasOne, Index, Model, PrimaryKey, Table, UpdatedAt } from "sequelize-typescript";
 import { PersonModel } from "./Person";
+import { DataTypes } from "sequelize";
+import { UUIDV7 } from "../data-types/UUID7";
+import { UUIDConverter } from "../data-types/uuid7-converter";
 
 
 @Table({
@@ -11,24 +14,26 @@ import { PersonModel } from "./Person";
 export class MarriageRecordModel extends Model{
 
     @PrimaryKey
-    @AutoIncrement
-    @Column
-    id: number;
-
-    @Index({ type: "UNIQUE", using: "BTREE"})
-    @Column(DataType.STRING)
-    publicId: string; 
+    @Column({
+        type: (DataTypes as any).UUIDV7,
+        defaultValue: UUIDV7.generateUUIDv7,
+    })
+    id: string;
 
     @ForeignKey( ()=> PersonModel )
-    @Column(DataType.INTEGER)
-    husbandId: number;
+    @Column({
+        type: (DataTypes as any).UUIDV7
+    })
+    husbandId: string;
 
     @BelongsTo(()=> PersonModel, 'husbandId')
     husband: PersonModel 
 
     @ForeignKey( ()=>PersonModel )
-    @Column(DataType.INTEGER)
-    wifeId: number;
+    @Column({
+        type: (DataTypes as any).UUIDV7
+    })
+    wifeId: string;
 
     @BelongsTo(()=> PersonModel, 'wifeId')
     wife: PersonModel;
@@ -44,4 +49,15 @@ export class MarriageRecordModel extends Model{
 
     @UpdatedAt
     updatedAt: Date;
+
+    @BeforeFind
+    static beforeFindHook(options: any){
+        new UUIDConverter().processQueryOptions(options);
+    }
+
+    @BeforeCreate
+    static beforeCreateHook(inputData: any){
+        new UUIDConverter().processInputData(inputData);
+    }
+        
 }

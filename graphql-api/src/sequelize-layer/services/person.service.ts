@@ -11,11 +11,35 @@ import { Gender, GenderEnum } from "src/gql-layer/scalars/gender.scalar";
 import { CreatePersonInput } from "src/gql-layer/inputs/create-person.input";
 import { faker } from "@faker-js/faker";
 import { MarriageReadError, MarriageReadErrorType } from "src/gql-layer/exceptions/marriageRead.error";
+import { UUIDV7 } from "../data-types/UUID7";
+import { GeneratorService } from "./generator.service";
 
 @Injectable()
 export class PersonServiceSequelize implements PersonService{
 
-    constructor(){}
+    constructor(public genService: GeneratorService ){
+        
+/*         setTimeout(()=>{
+            let where = {
+                [Op.or]: [
+                    {
+                        mother_id : "0194d6ad-9ab8-7613-a10d-073e9b39fe55"
+                    },
+                    {
+                        father_id : "0194d6ad-924b-7f71-a634-fe45ed7f8d40"
+                    }
+                ],
+                
+            }
+
+            let syms = Object.getOwnPropertySymbols(where);
+            
+            return PersonModel.findAll({
+                where
+            })
+        }, 3000);  */
+    
+    }   
 
     async createNewPerson(personData: CreatePersonInput) : Promise<Person>{
 
@@ -53,7 +77,7 @@ export class PersonServiceSequelize implements PersonService{
         });
     }
 
-    getPersonById(id: number): Promise<Person>{
+    getPersonById(id: string): Promise<Person>{
         return PersonModel.findOne({
             where: {
                 id
@@ -296,8 +320,13 @@ export class PersonServiceSequelize implements PersonService{
             throw Error("Invalid cursor, must be a valid json")    
         }
 
-        if(! Number(cursorObj.id) && cursorObj.id !=0 )
-            throw Error("Invalid cursor, id field must be a valid int")
+        if(!cursorObj.id ||  
+           ! UUIDV7.isUUIDv7(cursorObj.id)
+        )
+            throw Error("Invalid cursor, invalid Id field");
+
+        
+        cursorObj.id = UUIDV7._stringify(cursorObj.id);
 
 
         sort.forEach(( [field, dir]: [string, string]) => {
@@ -344,7 +373,7 @@ export class PersonServiceSequelize implements PersonService{
 
         let personData: PersonModel | null = await PersonModel.findOne({
             where: {
-                publicId: p.id
+                id: p.id
             }
         })
 
@@ -381,7 +410,7 @@ export class PersonServiceSequelize implements PersonService{
         
         let personData: PersonModel | null = await PersonModel.findOne({
             where: {
-                publicId: p.id
+                id: p.id
             }
         })
 
@@ -408,7 +437,8 @@ export class PersonServiceSequelize implements PersonService{
         .then((siblings: PersonModel[])=>{
             return siblings.map((sibling: PersonModel)=> this.personModelToPerson(sibling));
         })
-        .catch(()=>{
+        .catch((error)=>{
+            console.log(error);
             return [];
         })
     }
@@ -417,7 +447,7 @@ export class PersonServiceSequelize implements PersonService{
         
         let personData: PersonModel | null = await PersonModel.findOne({
             where: {
-                publicId: p.id
+                id: p.id
             }
         })
 
@@ -425,8 +455,8 @@ export class PersonServiceSequelize implements PersonService{
             return [];
 
         
-        let fatherId = personData.father_id ? personData.father_id: -2;
-        let motherId = personData.mother_id ? personData.mother_id: -2;
+        let fatherId = personData.father_id ? personData.father_id: "";
+        let motherId = personData.mother_id ? personData.mother_id: "";
 
         return PersonModel.findAll({
             where: {
@@ -443,28 +473,20 @@ export class PersonServiceSequelize implements PersonService{
         .then((parents: PersonModel[])=>{
             return parents.map((parent: PersonModel)=> this.personModelToPerson(parent));
         })
-        .catch(()=>{
+        .catch((error)=>{
+            console.log(error);
             return [];
         })
     }
 
     async marriedTo(p:Person): Promise<MarriedTo[]>{
 
-        let personData: PersonModel | null = await PersonModel.findOne({
-            where: {
-                publicId: p.id
-            }
-        });
-
-        if(!personData)
-            return [];
-
         let condition = { rType: 1 }; //marriage not divorce
 
         if(p.gender == GenderEnum.MALE)
-            condition["husbandId"] = personData.id;
+            condition["husbandId"] = p.id;
         else 
-            condition["wifeId"] = personData.id;
+            condition["wifeId"] = p.id;
 
         return MarriageRecordModel.findAll({
             where: {
@@ -508,23 +530,8 @@ export class PersonServiceSequelize implements PersonService{
             throw Error("inappropiate genders for parents");
         } 
         
-        let parent1Data: PersonModel | null = await PersonModel.findOne({
-            where: {
-                publicId: parent1.id
-            }
-        });
-
-        let parent2Data: PersonModel | null = await PersonModel.findOne({
-            where: {
-                publicId: parent2.id
-            }
-        });
-
-        if(!parent1Data || !parent2Data)
-            throw Error("parent not found");            
-
-        let father = parent1.gender == GenderEnum.MALE ? parent1Data: parent2Data;
-        let mother = parent1.gender == GenderEnum.FEMALE ? parent1Data: parent2Data;
+        let father = parent1.gender == GenderEnum.MALE ? parent1: parent2;
+        let mother = parent1.gender == GenderEnum.FEMALE ? parent1: parent2;
     
         return PersonModel.findAll({
             where: {
@@ -596,7 +603,7 @@ export class PersonServiceSequelize implements PersonService{
 
     personModelToPerson(personModel: PersonModel): Person{
         return {
-            id: personModel.publicId,
+            id: personModel.id,
             firstName: personModel.firstName,
             lastName: personModel.lastName,
             middleName: personModel.middleName,
@@ -610,7 +617,7 @@ export class PersonServiceSequelize implements PersonService{
 
     marriageRecordModelToMarriageRecord(record: MarriageRecordModel): MarriageRecord{
         return {
-            id: record.publicId,
+            id: record.id,
             husband: this.personModelToPerson(record.husband),
             wife: this.personModelToPerson(record.wife),
             mDate: record.mDate

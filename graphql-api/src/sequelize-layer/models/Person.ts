@@ -1,5 +1,8 @@
 
-import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedAt, Model, Index, Default } from "sequelize-typescript";
+import { DataTypes } from "sequelize";
+import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedAt, Model, Index, Default, BeforeFind, AfterFind, BeforeCreate } from "sequelize-typescript";
+import { UUIDV7 } from "../data-types/UUID7";
+import { UUIDConverter } from "../data-types/uuid7-converter";
 
 
 
@@ -11,17 +14,12 @@ import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedA
 })
 export class PersonModel extends Model {
 
-    @AutoIncrement    
     @PrimaryKey
-    @Column(DataType.INTEGER)
-    id: number;
-
-    @Index({ order: "ASC" , using: "BTREE"})
     @Column({
-        type: DataType.UUIDV4,
-        defaultValue: DataType.UUIDV4
+        type: (DataTypes as any).UUIDV7,
+        defaultValue: UUIDV7.generateUUIDv7,
     })
-    publicId: string;
+    id: string;
 
     @Index({ order: "ASC" , using: "BTREE"})
     @Column(DataType.STRING(40) )
@@ -52,15 +50,31 @@ export class PersonModel extends Model {
     @Column(DataType.STRING(100) )
     address: string;
     
-    @Column(DataType.INTEGER)
-    father_id?: number;
+    @Column({
+        type: (DataTypes as any).UUIDV7
+    })
+    father_id?: string;
 
-    @Column(DataType.INTEGER)
-    mother_id?: number;
+    @Column({
+        type: (DataTypes as any).UUIDV7
+    })
+    mother_id?: string;
 
     @CreatedAt
     createdAt?: Date;
     
     @UpdatedAt
     updateAt?: Date;
+
+
+    @BeforeFind
+    static beforeFindHook(options: any){
+        new UUIDConverter().processQueryOptions(options);
+    }
+
+    @BeforeCreate
+    static beforeCreateHook(inputData: any){
+        new UUIDConverter().processInputData(inputData.dataValues);
+    }
+    
 }

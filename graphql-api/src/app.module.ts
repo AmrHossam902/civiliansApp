@@ -13,6 +13,8 @@ import { PersonModel } from './sequelize-layer/models/Person';
 import { MarriedToResolver } from './gql-layer/resolvers/marriedTo.resolver';
 import { DateScalar } from './gql-layer/scalars/date.scalar';
 import { Gender} from './gql-layer/scalars/gender.scalar';
+import { DbProvider } from './sequelize-layer/db-provider';
+import { GeneratorService } from './sequelize-layer/services/generator.service';
 
 
 @Module({
@@ -25,25 +27,6 @@ import { Gender} from './gql-layer/scalars/gender.scalar';
       resolvers: {
         Gender: Gender
       }
-    }),
-    SequelizeModule.forRoot({
-      host: "localhost",
-      port: 3306,
-      username: "root",
-      password: "123456",
-      database: "civilDb",
-      dialect: "mysql",
-      logging: false,
-      pool: {
-          min: 3,
-          max: 8,
-          acquire: 30000,
-          idle: 10000 
-      },
-      models: [
-          MarriageRecordModel,
-          PersonModel
-      ]
     })
   ],
   providers: [
@@ -51,6 +34,8 @@ import { Gender} from './gql-layer/scalars/gender.scalar';
       provide: 'PersonService',
       useClass: PersonServiceSequelize
     },
+    GeneratorService,
+    DbProvider,
     PersonResolver, 
     MarriageResolver,
     MarriedToResolver,

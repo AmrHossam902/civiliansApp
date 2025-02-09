@@ -8,7 +8,7 @@ export interface PersonService {
     
     createNewPerson(personData: CreatePersonInput): Promise<Person>;
     
-    getPersonById(id: number): Promise<Person>;
+    getPersonById(id: string): Promise<Person>;
     
     getPersonBySSN(ssn: String): Promise<Person>;
     
