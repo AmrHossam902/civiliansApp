@@ -2,7 +2,7 @@
 import { Background, Controls, Edge, Node, ReactFlow, getNodesBounds, getViewportForBounds, useEdgesState, useNodesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useEffect, useMemo } from 'react';
-import Person from '@/interfaces/Person';
+import Person from '@/dtos/Person';
 
 import GraphBuilder from './graphBuilder';
 

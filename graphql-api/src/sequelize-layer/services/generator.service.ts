@@ -74,7 +74,11 @@ export class GeneratorService {
 
             try {
                 let gender : "male" | "female"
-                    = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[this.malesRate, 1] }) == 1 ? "male": "female";
+                    = RandomGenService.generateDiscreteRV({
+                        x: [0, 1], 
+                        y:[1- this.malesRate, 1] 
+                    }) == 1 ? 
+                        "male": "female";
         
         
                 let p: PersonModel = new PersonModel();
@@ -270,7 +274,7 @@ export class GeneratorService {
             let p: PersonModel = new PersonModel();
 
             let gender : "male" | "female"
-                = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[this.malesRate, 1] }) == 1 ? "male": "female";
+                = RandomGenService.generateDiscreteRV({ x: [0, 1], y:[1- this.malesRate, 1] }) == 1 ? "male": "female";
 
             p.firstName  = faker.person.firstName(gender).substring(0, 40);
             p.middleName = male.firstName;

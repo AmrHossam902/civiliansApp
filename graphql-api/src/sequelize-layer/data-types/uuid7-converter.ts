@@ -5,7 +5,7 @@ import { ModelAttributeColumnOptions } from "sequelize";
 
 export class UUIDConverter {
 
-    constructor(){}
+    construcor(){}
 
     processResult(result:Model | Array<Model>){
 
@@ -73,7 +73,7 @@ export class UUIDConverter {
             })
             
         }
-        else if(typeof clause == "object"){
+        else if(typeof clause == "object" && clause){
 
             //operators
             let symbols = Object.getOwnPropertySymbols(clause);
@@ -89,7 +89,5 @@ export class UUIDConverter {
             })
         }
     }
-
-
 
 }
