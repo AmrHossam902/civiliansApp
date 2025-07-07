@@ -66,7 +66,7 @@ export default function AllCivilians(){
 
     
     const fetchData = (dir: "after" | "before" | "")=>{ 
-        
+
         setPageState(PageState.IS_LOADING);
         const sortArr:[string, string][] = [];
         
@@ -76,7 +76,7 @@ export default function AllCivilians(){
             sortDescriptor.current.direction == "ascending" ? "asc" : "desc" 
         ]);
 
-        fetch("http://localhost:4000/graphql", {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/graphql`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -143,7 +143,7 @@ export default function AllCivilians(){
             <div className="mb-4">
                 <Button 
                     className="inline-block p-2 bg-secondary text-primary-lighter rounded-xl text-center"
-                    href={`http://localhost:3000/civilians/new`}
+                    href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/civilians/new`}
                     as={Link}
                     >create
                 </Button>
@@ -193,7 +193,7 @@ export default function AllCivilians(){
                         (colKey: Key) => { 
                         if(colKey == "family")
                             return <TableCell>
-                            <Link href={`http://localhost:3000/civilians/${row["ssn"]}`}>
+                            <Link href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/civilians/${row["ssn"]}`}>
                                 <IoIosPeople></IoIosPeople>
                             </Link>
                             </TableCell>
