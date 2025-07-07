@@ -15,6 +15,8 @@ import { DateScalar } from './gql-layer/scalars/date.scalar';
 import { Gender} from './gql-layer/scalars/gender.scalar';
 import { DbProvider } from './sequelize-layer/db-provider';
 import { GeneratorService } from './sequelize-layer/services/generator.service';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 
 @Module({
@@ -39,7 +41,12 @@ import { GeneratorService } from './sequelize-layer/services/generator.service';
     PersonResolver, 
     MarriageResolver,
     MarriedToResolver,
-    DateScalar
+    DateScalar,
+    AppService
+  ],
+
+  controllers: [
+    AppController
   ],
 })
 export class AppModule {}

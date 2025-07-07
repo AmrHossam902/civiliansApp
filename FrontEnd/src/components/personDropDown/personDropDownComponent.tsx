@@ -32,7 +32,7 @@ export function PersonDropDownComponent({
 
     const getPerson = useCallback((search: string) => {
 
-        return fetch("http://localhost:4000/graphql", {
+        return fetch(`${process.env.NEXT_PUBLIC_API_URL}/graphql`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

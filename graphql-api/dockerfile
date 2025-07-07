@@ -1,0 +1,12 @@
+FROM node:20-slim
+
+ADD package*.json app/
+WORKDIR /app
+RUN npm install
+
+ADD tsconfig*.json ./
+ADD src ./src
+RUN npm run build
+
+
+ENTRYPOINT [ "node", "dist/main.js" ]

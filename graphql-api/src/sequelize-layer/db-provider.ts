@@ -8,10 +8,10 @@ export const DbProvider = {
     useFactory: async () => {
 
         const sequelize = new Sequelize({
-            host: "localhost",
-            port: 3306,
+            host: `${process.env.DB_HOST || "localhost"}` ,
+            port: Number(process.env.DB_PORT) || 3306,
             username: "root",
-            password: "123456",
+            password: `${process.env.DB_ROOT_PASSWORD}`,
             database: "civilDb",
             dialect: "mysql",
             logging: false,

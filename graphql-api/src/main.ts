@@ -5,7 +5,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { 
     cors: { 
       origin: [
-        'http://localhost:3000'
+        process.env.PUBLIC_FRONTEND_URL as string, 
+        process.env.FRONT_URL as string,
       ]
     } 
   });

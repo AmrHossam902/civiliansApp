@@ -10,7 +10,7 @@ export default async function PersonalDetails({ params }: {params: Params}) {
 
    const fetchData = async ()=>{
             
-        return fetch("http://localhost:4000/graphql", {
+        return fetch(`${process.env.API_URL}/graphql`, {
             "method": "POST",
             headers: {
                 "Content-Type": "application/json"

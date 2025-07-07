@@ -1,0 +1,17 @@
+FROM node:20-slim
+
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_FRONTEND_URL
+
+ADD package*.json app/
+WORKDIR /app
+RUN npm install
+
+ADD next.config.mjs ./ 
+ADD postcss.config.mjs ./ 
+ADD tailwind.config.ts ./
+ADD tsconfig.* ./
+ADD src ./src
+RUN npm run build
+
+ENTRYPOINT [ "npm", "run", "start" ]

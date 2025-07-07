@@ -19,28 +19,8 @@ export class PersonServiceSequelize implements PersonService{
 
     constructor(public genService: GeneratorService ){
         
-/*         setTimeout(()=>{
-            let where = {
-                [Op.or]: [
-                    {
-                        mother_id : "0194d6ad-9ab8-7613-a10d-073e9b39fe55"
-                    },
-                    {
-                        father_id : "0194d6ad-924b-7f71-a634-fe45ed7f8d40"
-                    }
-                ],
-                
-            }
-
-            let syms = Object.getOwnPropertySymbols(where);
-            
-            return PersonModel.findAll({
-                where
-            })
-        }, 3000);  */
+    }  
     
-    }   
-
     async createNewPerson(personData: CreatePersonInput) : Promise<Person>{
 
         let father = await PersonModel.findOne({
