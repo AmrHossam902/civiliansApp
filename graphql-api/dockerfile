@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:20-alpine as builder
 
 ADD package*.json app/
 WORKDIR /app
@@ -8,5 +8,8 @@ ADD tsconfig*.json ./
 ADD src ./src
 RUN npm run build
 
+from node:20-alpine
+copy --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
 
 ENTRYPOINT [ "node", "dist/main.js" ]
