@@ -1,7 +1,8 @@
-FROM node:20-slim
+FROM node:20-slim as builder
 
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_FRONTEND_URL
+ARG FRONTEND_PORT
 
 ADD package*.json app/
 WORKDIR /app
@@ -14,4 +15,10 @@ ADD tsconfig.* ./
 ADD src ./src
 RUN npm run build
 
-ENTRYPOINT [ "npm", "run", "start" ]
+from node:20-alpine
+copy --from=builder /app/.next/standalone /
+
+ARG FRONTEND_PORT
+ENV PORT=${FRONTEND_PORT}
+ENV HOSTNAME=0.0.0.0
+ENTRYPOINT [ "node", "server.js" ]
