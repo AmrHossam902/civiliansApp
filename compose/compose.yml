@@ -3,26 +3,20 @@ name: NationalRecords
 services:
 
   FrontEnd: 
-    build:
-      context: ../FrontEnd
-      dockerfile: dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL} 
-        NEXT_PUBLIC_FRONTEND_URL: ${FRONTEND_PUBLIC_URL}
-        FRONTEND_PORT: ${FRONTEND_PORT}
     restart: always
-    image: nr-frontend
+    image: nr-frontend-dev
     ports:
       - 80:${FRONTEND_PORT}
     environment:
       NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL}
       API_URL : ${API_URL}
       NEXT_PUBLIC_FRONTEND_URL: ${FRONTEND_PUBLIC_URL}
+      HOST: ${HOST}
+      PORT: ${FRONTEND_PORT}
 
   BackEnd:
-    build: ../graphql-api
     restart: always
-    image: nr-backend
+    image: nr-backend-dev
     ports:
       - ${API_PORT}:${API_PORT}
     environment:

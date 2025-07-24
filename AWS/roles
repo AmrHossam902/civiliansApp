@@ -1,0 +1,40 @@
+iam:CreateRole    // create a new role (role)
+iam:UpdateRole    // update an existing role (role)
+iam:DeleteRole    // delete a role (role)
+iam:GetRole    // get details of a role (role)
+iam:PassRole    // pass a role to an AWS service (role)
+
+
+iam:AttachRolePolicy    // attach a managed policy to a role (role, policy arn)
+iam:DetachRolePolicy    // detach a managed policy from a role (role, policy arn)
+
+iam:PutRolePolicy    // add/update an inline policy to a role (role)
+
+iam:CreatePolicy   // create a new managed policy (policy)
+iam:DeletePolicy   // delete a managed policy
+iam:CreatePolicyVersion   // create a new version of a managed policy
+iam:DeletePolicyVersion   // delete a specific version of a managed policy
+
+//////////////////////////////////////////////////////////////////
+ecs:CreateCluster
+ecs:DeleteCluster
+ecs:UpdateCluster
+ecs:ListClusters
+ecs:DescribeClusters
+
+ecs:CreateCapacityProvider
+ecs:DeleteCapacityProvider
+ecs:UpdateCapacityProvider
+ecs:DescribeCapacityProviders
+
+
+ecs:CreateService
+ecs:UpdateService
+ecs:DeleteService
+ecs:DescribeServices
+
+
+ecs:RegisterTaskDefinition
+ecs:DescribeTaskDefinition
+
+///////////////////////////////////////////////////////////
