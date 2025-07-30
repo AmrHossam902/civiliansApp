@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize-typescript"
 import { MarriageRecordModel } from "./models/MarriageRecord"
 import { PersonModel } from "./models/Person"
 import { UUIDConverter } from "./data-types/uuid7-converter"
+import { UserModel } from "./models/User"
 
 export const DbProvider = {
     provide: 'SEQUELIZE',
@@ -23,7 +24,8 @@ export const DbProvider = {
             },
             models: [
                 MarriageRecordModel,
-                PersonModel
+                PersonModel,
+                UserModel
             ]
         })
 
