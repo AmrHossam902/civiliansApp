@@ -43,3 +43,13 @@ CREATE TABLE `marriageRecord` (
   CONSTRAINT `marriageRecord_ibfk_1` FOREIGN KEY (`husbandId`) REFERENCES `person` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `marriageRecord_ibfk_2` FOREIGN KEY (`wifeId`) REFERENCES `person` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user` (
+  `id` binary(16) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `accountId` int NOT NULL,
+  `passwordHash` varchar(100) NOT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -8,7 +8,9 @@ export class UUIDConverter {
     construcor(){}
 
     processResult(result:Model | Array<Model>){
-
+        if(!result)
+            return;
+        
         if( Array.isArray(result) )
             result.forEach( item => {
                 this.processResult(item);

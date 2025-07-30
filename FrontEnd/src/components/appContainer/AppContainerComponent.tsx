@@ -11,7 +11,7 @@ export function AppContainerComponent({children}: Props){
     
     const { theme } = useContext(ThemeContext);
 
-    return <div data-theme={theme} className="bg-primary-lighter">
+    return <div data-theme={theme} className="bg-primary-lighter v-screen h-screen">
         {children}
     </div>
 }
