@@ -3,6 +3,8 @@ import { AuthService } from "src/gql-layer/auth-service.interface";
 import { UserModel } from "../models/User";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
+import { UserRoleModel } from "../models/User_role";
+import { RoleModel } from "../models/Role";
 
 @Injectable()
 export class AuthServiceSequelize implements AuthService {
@@ -18,25 +20,43 @@ export class AuthServiceSequelize implements AuthService {
             const user = await UserModel.findOne({
                 where: {
                     accountId 
-                }
+                },
+                include: [
+                    {
+                        model: UserRoleModel,
+                        include: [
+                            {
+                                model: RoleModel
+                            }
+                        ]
+                    }
+                ]
             });
 
             if(!user)
                 throw new Error("INVALID_CREDENTIALS");
 
+            const roles = user.userRoles.map((userRole)=>{
+                return {
+                    name: userRole.role.name,
+                    permissions: userRole.role.permissions
+                }
+            })
+
             return bcrypt.compare(password, user.passwordHash)
             .then(()=>{
+
                 const accessToken = this.jwtService.sign({
                     accountId, 
-                    name: user.name 
-                })
+                    name: user.name,
+                    roles
+                });
 
                 const refreshToken = this.jwtService.sign({
                     accountId,
-                    name: user.name
                 }, {
                     expiresIn: '2h'
-                })
+                });
 
                 return {
                     accessToken,
@@ -60,6 +80,8 @@ export class AuthServiceSequelize implements AuthService {
             throw new Error('INVALID_REFRESH_TOKEN');
         }
     }
+
+    
 
 
 }

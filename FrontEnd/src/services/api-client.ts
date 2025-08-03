@@ -7,7 +7,7 @@ const fireRequest = (body: Object)=>{
         `Bearer ${accessToken}` : '';
 
 
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/graphql`, {
+    return fetch(`${process.env.NEXT_PUBLIC_URL}/graphql`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -27,7 +27,7 @@ function regenerateAccessToken(){
 
     const authHeader = `Bearer ${refreshToken}`;
 
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/graphql`, {
+    return fetch(`${process.env.NEXT_PUBLIC_URL}/graphql`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

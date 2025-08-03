@@ -4,7 +4,7 @@ import { Button, Input, Spinner } from "@nextui-org/react";
 import './login-styles.css';
 import { useCallback, useState } from "react";
 import InputState from "@/types/inputState";
-import { login } from "@/services/auth.service";
+import { decodeJWT, login } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 
 export default function Login(){
@@ -125,6 +125,7 @@ export default function Login(){
                                 
                                 localStorage.setItem('accessToken', response.data.login.accessToken);
                                 localStorage.setItem('refreshToken', response.data.login.refreshToken);
+                                decodeJWT(response.data.login.accessToken);
                             
                                 router.push('/civilians');
                             }
