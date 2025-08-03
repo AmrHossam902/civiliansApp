@@ -6,8 +6,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { 
     cors: { 
       origin: [
-        process.env.PUBLIC_FRONTEND_URL as string, 
-        process.env.FRONT_URL as string,
+        process.env.PUBLIC_URL as string, 
+        process.env.FRONTEND_INTERNAL_URL as string,
       ]
     } 
   });

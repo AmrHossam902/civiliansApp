@@ -53,3 +53,22 @@ CREATE TABLE `user` (
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `role` (
+  `id` binary(16) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `permissions` json DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user_role` (
+  `id` binary(16) NOT NULL,
+  `roleId` binary(16) DEFAULT NULL,
+  `userId` binary(16) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_user_role_roleId` (`roleId`),
+  KEY `FK_user_role_userId` (`userId`),
+  CONSTRAINT `FK_user_role_roleId` FOREIGN KEY (`roleId`) REFERENCES `role` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_user_role_userId` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

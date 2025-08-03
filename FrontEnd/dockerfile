@@ -1,8 +1,7 @@
 FROM node:20-slim as builder
 
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_FRONTEND_URL
-ARG FRONTEND_PORT
+ARG NEXT_PUBLIC_URL
+ARG FRONTEND_CONTAINER_PORT
 
 ADD package*.json app/
 WORKDIR /app
@@ -14,11 +13,12 @@ ADD tailwind.config.ts ./
 ADD tsconfig.* ./
 ADD src ./src
 RUN npm run build
+RUN cp -r .next/static .next/standalone/.next/static
 
-from node:20-alpine
-copy --from=builder /app/.next/standalone /
+FROM node:20-alpine
+COPY --from=builder /app/.next/standalone /
 
-ARG FRONTEND_PORT
-ENV PORT=${FRONTEND_PORT}
+ARG FRONTEND_CONTAINER_PORT
+ENV PORT=${FRONTEND_CONTAINER_PORT}
 ENV HOSTNAME=0.0.0.0
 ENTRYPOINT [ "node", "server.js" ]

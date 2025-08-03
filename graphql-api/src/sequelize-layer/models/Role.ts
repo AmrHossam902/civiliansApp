@@ -1,19 +1,18 @@
-
 import { DataTypes } from "sequelize";
-import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedAt, Model, Index, Default, BeforeFind, AfterFind, BeforeCreate, HasMany } from "sequelize-typescript";
+import { AutoIncrement, Column, CreatedAt, DataType, PrimaryKey, Table, UpdatedAt, Model, Index, Default, BeforeFind, AfterFind, BeforeCreate } from "sequelize-typescript";
 import { UUIDV7 } from "../data-types/UUID7";
 import { UUIDConverter } from "../data-types/uuid7-converter";
-import { UserRoleModel } from "./User_role";
 
 
 
 @Table({
     charset: "utf8mb4",
     collate: "utf8mb4_general_ci",
-    tableName: "user",
+    tableName: "role",
+    timestamps: false,
     freezeTableName: true
 })
-export class UserModel extends Model {
+export class RoleModel extends Model {
 
     @PrimaryKey
     @Column({
@@ -23,26 +22,15 @@ export class UserModel extends Model {
     id: string;
 
     @Column({
-        type: DataType.STRING(100),
+        type: DataType.STRING(50),
         allowNull: false
     })
     name: string;
 
     @Column({
-        type: DataType.INTEGER,
-        allowNull: false
+        type: DataType.JSON
     })
-    accountId: number;
-
-    @Column({
-        type: DataType.STRING(100),
-        allowNull: false
-    })
-    passwordHash: string;
-
-    @HasMany(()=> UserRoleModel, 'userId')
-    userRoles: UserRoleModel[];
-
+    permissions: string[];
 
     @BeforeCreate
     static beforeCreateHook(inputData: any){
