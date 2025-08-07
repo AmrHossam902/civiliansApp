@@ -136,7 +136,8 @@ export default function AllCivilians(){
             <div className="mb-4">
                 <Button 
                     className="inline-block p-2 bg-secondary text-primary-lighter rounded-xl text-center"
-                    href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/civilians/new`}
+                    href={`${process.env.NEXT_PUBLIC_URL}/civilians/new`}
+                    prefetch={false}
                     as={Link}
                     >create
                 </Button>
@@ -186,7 +187,7 @@ export default function AllCivilians(){
                         (colKey: Key) => { 
                         if(colKey == "family")
                             return <TableCell>
-                            <Link href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/civilians/${row["ssn"]}`}>
+                            <Link href={`${process.env.NEXT_PUBLIC_URL}/civilians/${row["ssn"]}`} prefetch={false}>
                                 <IoIosPeople></IoIosPeople>
                             </Link>
                             </TableCell>
