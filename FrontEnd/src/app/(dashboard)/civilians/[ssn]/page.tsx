@@ -1,5 +1,6 @@
 import FamilyTreeComponent from "@/components/family/FamilyTreeComponent";
 import Person from "@/dtos/Person";
+import { cookies } from "next/headers";
 
 
 type Params = {
@@ -8,12 +9,16 @@ type Params = {
 
 export default async function PersonalDetails({ params }: {params: Params}) {
 
-   const fetchData = async ()=>{
+    const cookieStore = await cookies();
+    const token = cookieStore.get('accessToken');
+    console.log(token);
+    const fetchData = async ()=>{
             
         return fetch(`${process.env.BACKEND_INTERNAL_URL}/graphql`, {
             "method": "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Cookie": `accessToken=${token?.value};`
               },
             cache: 'no-cache',
             body: JSON.stringify({
@@ -96,6 +101,13 @@ export default async function PersonalDetails({ params }: {params: Params}) {
     };
 
     const data = await fetchData();
+
+    if(!data.data?.someone){
+        return <div className="w-full h-full">
+            no such person exists
+        </div>
+    }
+
     console.log(JSON.stringify(data, undefined, "   "));
     const personInfo: Person = data.data.someone; 
 
