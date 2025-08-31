@@ -2,9 +2,15 @@ import * as cdk from 'aws-cdk-lib';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
-import { NetworkProps } from '../props/network-props.interface';
+import { NetworkProps } from '../props/network-props';
+import * as ecr from 'aws-cdk-lib/aws-ecr';
 
 export class StorageStack extends cdk.Stack {
+
+    rdsInstance: rds.DatabaseInstance;
+    feEcrRepository: ecr.Repository;
+    beEcrRepository: ecr.Repository;
+
     constructor(scope: Construct, id: string, props: cdk.StackProps & NetworkProps) {
         super(scope, id, props);
 
@@ -14,7 +20,7 @@ export class StorageStack extends cdk.Stack {
         // extract private subnet 
         const privateSubnets = props.vpc.privateSubnets;
         
-        new rds.DatabaseInstance(this, 'rds-instance', {
+        this.rdsInstance = new rds.DatabaseInstance(this, 'rds-instance', {
             vpc: props.vpc,
             vpcSubnets: { subnets: privateSubnets },
             engine: rds.DatabaseInstanceEngine.mysql({
@@ -28,7 +34,20 @@ export class StorageStack extends cdk.Stack {
             deletionProtection: false,
             credentials: rds.Credentials.fromPassword('root', cdk.SecretValue.unsafePlainText('pwivY5aW8EPPtWB')),
             databaseName: 'civiliansDb',
-            removalPolicy: cdk.RemovalPolicy.DESTROY
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            port: 3306
+        });
+
+        this.feEcrRepository = new ecr.Repository(this, "FE_Repository", {
+            repositoryName: 'next-app-repository',
+            removalPolicy: cdk.RemovalPolicy.DESTROY ,
+            emptyOnDelete: true
+        });
+
+        this.beEcrRepository = new ecr.Repository(this, "BE_Repository", {
+            repositoryName: 'nest-app-repository',
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            emptyOnDelete: true
         });
 
     }

@@ -2,11 +2,20 @@ import * as cdk from 'aws-cdk-lib';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as ecr from 'aws-cdk-lib/aws-ecr';
+import * as sd from 'aws-cdk-lib/aws-servicediscovery';
+
 import { Construct } from "constructs";
-import { NetworkProps } from '../props/network-props.interface';
+import { NetworkProps } from '../props/network-props';
+import { ServiceDiscovery } from 'aws-cdk-lib/aws-appmesh';
 
 
 export class InfrastructureStack extends cdk.Stack {
+    alb: elbv2.ApplicationLoadBalancer;
+    ecsCluster: ecs.Cluster;
+    feTG: elbv2.ApplicationTargetGroup;
+    beTG: elbv2.ApplicationTargetGroup;
+
     constructor(scope: Construct, id: string, props?: cdk.StackProps & NetworkProps) {
         super(scope, id, props);
 
@@ -18,17 +27,17 @@ export class InfrastructureStack extends cdk.Stack {
         const privateSubnets = props.vpc.privateSubnets;
 
 
-        const alb = new elbv2.ApplicationLoadBalancer(this, 'Internet_Facing_ALB', {
+        this.alb = new elbv2.ApplicationLoadBalancer(this, 'Internet_Facing_ALB', {
             vpc: props.vpc,
             vpcSubnets: { subnets: publicSubnets },
             internetFacing: true,
             loadBalancerName: 'alb',
         });
 
-        const feTG = new elbv2.ApplicationTargetGroup(this, 'FE_TG', {
+        this.feTG = new elbv2.ApplicationTargetGroup(this, 'FE_TG', {
             vpc: props.vpc,
             targetGroupName: 'front-end-target-group',
-            targetType: elbv2.TargetType.IP,
+            targetType: elbv2.TargetType.INSTANCE,
             port: 80,
             protocol: elbv2.ApplicationProtocol.HTTP,
             healthCheck: {
@@ -38,10 +47,10 @@ export class InfrastructureStack extends cdk.Stack {
             },
         });
 
-        const beTG = new elbv2.ApplicationTargetGroup(this, 'BE_TG', {
+        this.beTG = new elbv2.ApplicationTargetGroup(this, 'BE_TG', {
             vpc: props.vpc,
             targetGroupName: 'backend-target-group',
-            targetType: elbv2.TargetType.IP,
+            targetType: elbv2.TargetType.INSTANCE,
             port: 80,
             protocol: elbv2.ApplicationProtocol.HTTP,
             healthCheck: {
@@ -51,24 +60,38 @@ export class InfrastructureStack extends cdk.Stack {
             },
         });
 
-        const listener = alb.addListener('ALB_Listener', {
+        const listener = this. alb.addListener('ALB_Listener', {
             protocol: elbv2.ApplicationProtocol.HTTP,
             port: 80,
             open: true,
-            defaultTargetGroups: [feTG],
+            defaultTargetGroups: [this.feTG],
         });
 
         new elbv2.ApplicationListenerRule(this, 'BE_Listener_Rule', {
             priority: 1,
             listener: listener,
             conditions: [elbv2.ListenerCondition.pathPatterns(['/graphql/*'])],
-            action: elbv2.ListenerAction.forward([beTG])
+            action: elbv2.ListenerAction.forward([this.beTG])
         })
 
         // -----------------
         // ECS Cluster
         // -----------------
-        const cluster = new ecs.Cluster(this, 'ECS_Cluster', {
+
+        //use this to create a new fresh Cloudmap namespace
+        /* const ecsNs = new sd.PrivateDnsNamespace(this, "ECS_Namespace", {
+            name: 'ecs-clusterns',
+            vpc: props.vpc
+        }); */
+
+        //use this to get an existing cloudmap namespace
+        const ecsNs = sd.PrivateDnsNamespace.fromPrivateDnsNamespaceAttributes(this, "ECS_Namespace", {
+            namespaceName: 'ecs-cluster.local',
+            namespaceArn: "arn:aws:servicediscovery:<region>:<account-id>:namespace/ns-xxxxxxxxxxxxxxxx",
+            namespaceId: "ns-xxxx",
+        });
+
+        this.ecsCluster = new ecs.Cluster(this, 'ECS_Cluster', {
             vpc: props.vpc,
             clusterName: 'ecs-cluster', 
             capacity: {
@@ -86,9 +109,15 @@ export class InfrastructureStack extends cdk.Stack {
                 machineImage: ecs.EcsOptimizedImage.amazonLinux2023(ecs.AmiHardwareType.STANDARD, {
                     cachedInContext: true,
                 }),
-                allowAllOutbound: true
-            }
+                allowAllOutbound: true ,
+            },
+            defaultCloudMapNamespace: {
+                name: ecsNs.namespaceName,  // reference existing namespace
+                useForServiceConnect: true
+            }          
         });
-    }
 
+
+
+    }
 }
