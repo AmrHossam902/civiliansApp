@@ -1,0 +1,30 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid" : "CloudFormationRolePermissions",
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:UpdateRole",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:DeleteRolePolicy"
+            ],
+            "Resource": [ 
+                "arn:aws:iam:us-east-1:597088039155:role/nat-rec-*",
+                "arn:aws:iam::aws:policy/nat-rec-*"
+            ]
+        },
+        {
+            "Sid": "CloudFormationPolicyPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy"   
+            ],
+            "Resource": ""
+        }
+    ]
+}
