@@ -31,7 +31,8 @@ new AppStack(app, 'app-stack', {
   ecsCluster: infraStack.ecsCluster,
   alb: infraStack.alb,
   feTG: infraStack.feTG,
-  beTG: infraStack.beTG
+  beTG: infraStack.beTG,
+  ecsNs: infraStack.ecsNs
 
 })
 
