@@ -1,6 +1,7 @@
 'use client'
 import { SearchComponent } from "@/components/search/searchComponent";
 import { SideBarComponent } from "@/components/sidebar/sideBarComponent";
+import { sendRequest } from "@/services/api-client";
 import { Button, Input, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import  Link  from 'next/link';
 import { Key, useEffect, useRef, useState } from "react";
@@ -76,37 +77,29 @@ export default function AllCivilians(){
             sortDescriptor.current.direction == "ascending" ? "asc" : "desc" 
         ]);
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/graphql`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          cache: 'no-cache',
-          body: JSON.stringify({
+        sendRequest({
             query: `query people($search: String, $limit: Int, $after: String, $before: String, $sort: [[String!]!]){
-              people(search: $search, limit: $limit, after: $after, before: $before, sort: $sort) {
-                people {
-                  firstName
-                  lastName
-                  middleName
-                  ssn
-                  birthDate
-                  gender
+                people(search: $search, limit: $limit, after: $after, before: $before, sort: $sort) {
+                    people {
+                    firstName
+                    lastName
+                    middleName
+                    ssn
+                    birthDate
+                    gender
+                    }
+                    next
+                    prev
                 }
-                next
-                prev
-              }
-          }`,
-          variables: {
-            "limit": 10,
-            "after": dir == "after" ? pagination.current.next: "",
-            "before": dir == "before" ? pagination.current.prev: "",
-            "sort": sortArr,
-            "search": searchVal.current
-          }
-          })
+            }`,
+            variables: {
+                "limit": 10,
+                "after": dir == "after" ? pagination.current.next: "",
+                "before": dir == "before" ? pagination.current.prev: "",
+                "sort": sortArr,
+                "search": searchVal.current
+            }
         })
-        .then( res => res.json())
         .then(data => { 
             pagination.current.next = data.data.people.next || "";
             pagination.current.prev = data.data.people.prev || "";
@@ -119,7 +112,7 @@ export default function AllCivilians(){
             console.error(e); 
         });
 
-    return <div>all civilians</div>;
+        return <div>all civilians</div>;
     }
 
     function onSortChange(sortDesc: SortDescriptor){
@@ -143,7 +136,8 @@ export default function AllCivilians(){
             <div className="mb-4">
                 <Button 
                     className="inline-block p-2 bg-secondary text-primary-lighter rounded-xl text-center"
-                    href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/civilians/new`}
+                    href={`${process.env.NEXT_PUBLIC_URL}/civilians/new`}
+                    prefetch={false}
                     as={Link}
                     >create
                 </Button>
@@ -193,7 +187,7 @@ export default function AllCivilians(){
                         (colKey: Key) => { 
                         if(colKey == "family")
                             return <TableCell>
-                            <Link href={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/civilians/${row["ssn"]}`}>
+                            <Link href={`${process.env.NEXT_PUBLIC_URL}/civilians/${row["ssn"]}`} prefetch={false}>
                                 <IoIosPeople></IoIosPeople>
                             </Link>
                             </TableCell>

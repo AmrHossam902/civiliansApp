@@ -17,6 +17,11 @@ import { DbProvider } from './sequelize-layer/db-provider';
 import { GeneratorService } from './sequelize-layer/services/generator.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthServiceSequelize } from './sequelize-layer/services/auth.service';
+import { AuthResolver } from './gql-layer/resolvers/auth.resolver';
+import { JwtAuthGuard } from './gql-layer/auth/auth.guard';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './gql-layer/auth/jwt-strategy';
 
 
 @Module({
@@ -29,6 +34,12 @@ import { AppService } from './app.service';
       resolvers: {
         Gender: Gender
       }
+    }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: {
+        expiresIn: '3m'
+      }
     })
   ],
   providers: [
@@ -36,12 +47,19 @@ import { AppService } from './app.service';
       provide: 'PersonService',
       useClass: PersonServiceSequelize
     },
+    {
+      provide: 'AuthService',
+      useClass: AuthServiceSequelize
+    },
     GeneratorService,
     DbProvider,
+    AuthResolver,
     PersonResolver, 
     MarriageResolver,
     MarriedToResolver,
     DateScalar,
+    JwtAuthGuard,
+    JwtStrategy,
     AppService
   ],
 

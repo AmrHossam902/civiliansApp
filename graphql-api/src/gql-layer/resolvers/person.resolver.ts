@@ -3,15 +3,17 @@ import { PersonService } from '../person-service.interface';
 import { Person } from '../models/person.model';
 import { PeoplePage } from '../models/people-page.model';
 import { FilterInput } from '../inputs/filter.input';
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { MarriedTo } from '../models/marriedTo.model';
 import { CreatePersonInput } from '../inputs/create-person.input';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Resolver(() => Person)
 export class PersonResolver {
   constructor(@Inject('PersonService') private readonly personService: PersonService) {}
 
-  @Query(() => PeoplePage, {nullable: false} )
+  @Query(() => PeoplePage, {nullable: false})
   async people(
     @Args('after', { nullable: true }) after: string,
     @Args('before', { nullable: true }) before: string,
