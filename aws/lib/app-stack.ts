@@ -34,9 +34,9 @@ export class AppStack extends Stack {
         feTd.addContainer('Next_App_Container', {
             containerName: 'next-app-container',
             image: ecs.ContainerImage.fromEcrRepository(props?.feEcrRepository),
-            cpu: 256,
-            memoryLimitMiB: 512,           // hard limit
-            memoryReservationMiB: 256,     // soft limit
+            cpu: 150,
+            memoryLimitMiB: 200,           // hard limit
+            memoryReservationMiB: 100,     // soft limit
             portMappings: [
                 {
                     containerPort: 80,
@@ -45,9 +45,11 @@ export class AppStack extends Stack {
             ],
             essential: true,
             environment: {
-                API_URL : `http://${props?.alb.loadBalancerDnsName}`,
                 NEXT_PUBLIC_API_URL: `http://${props?.alb.loadBalancerDnsName}`,
-                NEXT_PUBLIC_FRONTEND_URL: `http://${props?.alb.loadBalancerDnsName}`
+                API_URL : `http://gql-api`,
+                NEXT_PUBLIC_FRONTEND_URL: `http://${props?.alb.loadBalancerDnsName}`,
+                HOST: "0.0.0.0",
+                PORT: "80"
             },
             logging: ecs.LogDrivers.awsLogs({
                 logGroup: appLogGroup,
@@ -64,9 +66,9 @@ export class AppStack extends Stack {
         beTd.addContainer('GQL_Container', {
             containerName: 'gql-container',
             image: ecs.ContainerImage.fromEcrRepository(props?.beEcrRepository),
-            cpu: 256,
-            memoryLimitMiB: 512,           // hard limit
-            memoryReservationMiB: 256,     // soft limit
+            cpu: 150,
+            memoryLimitMiB: 250,           // hard limit
+            memoryReservationMiB: 100,     // soft limit
             portMappings: [
                 {
                     name: 'be-mapping',
@@ -94,7 +96,7 @@ export class AppStack extends Stack {
             serviceName: 'front-end-service',
             cluster: props.ecsCluster,
             taskDefinition: feTd,
-            desiredCount: 1
+            desiredCount: 1,
         });
 
         const beService = new ecs.Ec2Service(this, "BE_Service", {
@@ -103,6 +105,7 @@ export class AppStack extends Stack {
             taskDefinition: beTd,
             desiredCount: 1,
             serviceConnectConfiguration: {
+                namespace: props.ecsNs.namespaceName,
                 services: [
                     {
                         portMappingName: 'be-mapping',
@@ -121,8 +124,8 @@ export class AppStack extends Stack {
         beService.connections.allowFrom(props.alb, Port.allTcp());
 
         // this way we force cloudformation to export the SG of rds
-        props.rdsInstance.connections.securityGroups[0]
+/*         props.rdsInstance.connections.securityGroups[0]
         .addIngressRule(beService.connections.securityGroups[0], Port.tcp(3306));
-        
+         */
     }
 }

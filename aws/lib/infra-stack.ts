@@ -15,6 +15,7 @@ export class InfrastructureStack extends cdk.Stack {
     ecsCluster: ecs.Cluster;
     feTG: elbv2.ApplicationTargetGroup;
     beTG: elbv2.ApplicationTargetGroup;
+    ecsNs: sd.IPrivateDnsNamespace
 
     constructor(scope: Construct, id: string, props?: cdk.StackProps & NetworkProps) {
         super(scope, id, props);
@@ -33,17 +34,16 @@ export class InfrastructureStack extends cdk.Stack {
             internetFacing: true,
             loadBalancerName: 'alb',
         });
-
+ 
         this.feTG = new elbv2.ApplicationTargetGroup(this, 'FE_TG', {
             vpc: props.vpc,
             targetGroupName: 'front-end-target-group',
             targetType: elbv2.TargetType.INSTANCE,
-            port: 80,
             protocol: elbv2.ApplicationProtocol.HTTP,
             healthCheck: {
                 path: '/',
                 protocol: elbv2.Protocol.HTTP,
-                healthyHttpCodes: '200',
+                healthyHttpCodes: '200-399',
             },
         });
 
@@ -51,13 +51,12 @@ export class InfrastructureStack extends cdk.Stack {
             vpc: props.vpc,
             targetGroupName: 'backend-target-group',
             targetType: elbv2.TargetType.INSTANCE,
-            port: 80,
             protocol: elbv2.ApplicationProtocol.HTTP,
             healthCheck: {
                 path: '/',
                 protocol: elbv2.Protocol.HTTP,
-                healthyHttpCodes: '200',
-            },
+                healthyHttpCodes: '200-399',
+            },  
         });
 
         const listener = this. alb.addListener('ALB_Listener', {
@@ -85,10 +84,10 @@ export class InfrastructureStack extends cdk.Stack {
         }); */
 
         //use this to get an existing cloudmap namespace
-        const ecsNs = sd.PrivateDnsNamespace.fromPrivateDnsNamespaceAttributes(this, "ECS_Namespace", {
-            namespaceName: 'ecs-cluster.local',
-            namespaceArn: "arn:aws:servicediscovery:<region>:<account-id>:namespace/ns-xxxxxxxxxxxxxxxx",
-            namespaceId: "ns-xxxx",
+        this.ecsNs = sd.PrivateDnsNamespace.fromPrivateDnsNamespaceAttributes(this, "ECS_Namespace", {
+            namespaceName: 'my-namespace',
+            namespaceArn: "arn:aws:servicediscovery:us-east-1:597088039155:namespace/ns-v3zz4wls6egjadzb",
+            namespaceId: "ns-v3zz4wls6egjadzb",
         });
 
         this.ecsCluster = new ecs.Cluster(this, 'ECS_Cluster', {
@@ -110,11 +109,7 @@ export class InfrastructureStack extends cdk.Stack {
                     cachedInContext: true,
                 }),
                 allowAllOutbound: true ,
-            },
-            defaultCloudMapNamespace: {
-                name: ecsNs.namespaceName,  // reference existing namespace
-                useForServiceConnect: true
-            }          
+            },    
         });
 
 
