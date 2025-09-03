@@ -7,7 +7,7 @@ import { GeneratorService } from './sequelize-layer/services/generator.service';
 export class AppController {
   constructor(private readonly appService: AppService, private genService: GeneratorService) {}
 
-  @Get()
+  @Get("/health")
   getHello(): string {
     return this.appService.getHello();
   }
