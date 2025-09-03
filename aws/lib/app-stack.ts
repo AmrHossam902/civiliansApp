@@ -45,9 +45,9 @@ export class AppStack extends Stack {
             ],
             essential: true,
             environment: {
-                NEXT_PUBLIC_API_URL: `http://${props?.alb.loadBalancerDnsName}`,
-                API_URL : `http://gql-api`,
-                NEXT_PUBLIC_FRONTEND_URL: `http://${props?.alb.loadBalancerDnsName}`,
+                NEXT_PUBLIC_URL: `http://${props?.alb.loadBalancerDnsName}`,
+                BACKEND_INTERNAL_URL : `http://gql-api`,
+                JWT_SECRET : "sdhkj383nsdas&dasdas@daskh122jhcAjGsnSK3YcbsoG",
                 HOST: "0.0.0.0",
                 PORT: "80"
             },
@@ -78,12 +78,13 @@ export class AppStack extends Stack {
             ],
             essential: true,
             environment: {
-                PUBLIC_FRONTEND_URL: `http://${props?.alb.loadBalancerDnsName}`,
-                FRONT_URL:  'http://frontend',
+
+                PUBLIC_URL: `http://${props?.alb.loadBalancerDnsName}`,
+                FRONTEND_INTERNAL_URL:  'http://frontend',
                 DB_HOST: props.rdsInstance.dbInstanceEndpointAddress,
                 DB_PORT: props.rdsInstance.dbInstanceEndpointPort,
                 DB_ROOT_PASSWORD: 'pwivY5aW8EPPtWB',
-                PORT: "80",
+                PORT: "80"
             },
             logging: ecs.LogDrivers.awsLogs({
                 logGroup: appLogGroup,

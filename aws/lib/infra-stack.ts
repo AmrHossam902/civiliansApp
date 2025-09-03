@@ -8,6 +8,7 @@ import * as sd from 'aws-cdk-lib/aws-servicediscovery';
 import { Construct } from "constructs";
 import { NetworkProps } from '../props/network-props';
 import { ServiceDiscovery } from 'aws-cdk-lib/aws-appmesh';
+import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
 
 
 export class InfrastructureStack extends cdk.Stack {
@@ -90,29 +91,46 @@ export class InfrastructureStack extends cdk.Stack {
             namespaceId: "ns-v3zz4wls6egjadzb",
         });
 
-        this.ecsCluster = new ecs.Cluster(this, 'ECS_Cluster', {
+        const asg = new AutoScalingGroup(this, "ECS_Asg", {
+            autoScalingGroupName: 'ecs-asg',
             vpc: props.vpc,
-            clusterName: 'ecs-cluster', 
-            capacity: {
-                instanceType: ec2.InstanceType.of(
-                    ec2.InstanceClass.T2,
-                    ec2.InstanceSize.MICRO
-                ),
-                minCapacity: 1,
-                maxCapacity: 2,
-                vpcSubnets: {
-                    subnets: privateSubnets
-                },
-                autoScalingGroupName: 'ecs-asg',
-                // keyPair:
-                machineImage: ecs.EcsOptimizedImage.amazonLinux2023(ecs.AmiHardwareType.STANDARD, {
-                    cachedInContext: true,
-                }),
-                allowAllOutbound: true ,
-            },    
+            vpcSubnets: {
+                subnets: privateSubnets
+            },
+
+            minCapacity: 1,
+            maxCapacity: 3,
+
+            instanceType: ec2.InstanceType.of(
+                ec2.InstanceClass.T2,
+                ec2.InstanceSize.MICRO
+            ),
+
+            machineImage: ecs.EcsOptimizedImage.amazonLinux2023(ecs.AmiHardwareType.STANDARD, {
+                cachedInContext: true,
+            }),
+
+            allowAllOutbound: true
+            
         });
 
+        const ecsCapProvider = new ecs.AsgCapacityProvider(this, "Ecs_Ec2_Provider", {
+            autoScalingGroup: asg,
+            capacityProviderName: 'ec2-capacity-provider',
+            enableManagedScaling: true,
 
+            minimumScalingStepSize: 1,
+            maximumScalingStepSize: 1,
+            targetCapacityPercent: 75,  // thr (cpu) to scale around
+
+        })
+
+        this.ecsCluster = new ecs.Cluster(this, 'ECS_Cluster', {
+            vpc: props.vpc,
+            clusterName: 'ecs-cluster'
+        });
+
+        this.ecsCluster.addAsgCapacityProvider(ecsCapProvider);
 
     }
 }

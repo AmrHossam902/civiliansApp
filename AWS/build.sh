@@ -1,9 +1,10 @@
 docker build \
---build-arg NEXT_PUBLIC_API_URL=http://civilians-1929392670.us-east-1.elb.amazonaws.com \
---build-arg NEXT_PUBLIC_FRONTEND_URL=http://civilians-1929392670.us-east-1.elb.amazonaws.com \
--t civilians-frontend \
+--build-arg NEXT_PUBLIC_URL=http://alb-1419133554.us-east-1.elb.amazonaws.com \
+--build-arg FRONTEND_CONTAINER_PORT=80 \
+-t civilians-frontend-prod \
 ../FrontEnd/.;
 
+
 docker build \
--t civilians-backend \
+-t civilians-backend-prod \
 ../graphql-api/.;
