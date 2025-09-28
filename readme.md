@@ -66,6 +66,10 @@ this app is for educational purposes developped in NextJs and GraphQl, it connec
    any kind of flows that you meant to execute once like refreshing your access token
 
     to get over it, you can set prefetch={false} on every Next Link component
+
+4- ECS optimized image has a problem with ECS service connect 
+
+    - try 
 ## screen shots
 
 #### listing all civilians

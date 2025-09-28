@@ -4,22 +4,28 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import { NetworkProps } from '../props/network-props';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
+import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
+import path from 'path';
 
 export class StorageStack extends cdk.Stack {
 
     rdsInstance: rds.DatabaseInstance;
+    rdsSg: ec2.SecurityGroup; 
     feEcrRepository: ecr.Repository;
     beEcrRepository: ecr.Repository;
 
     constructor(scope: Construct, id: string, props: cdk.StackProps & NetworkProps) {
         super(scope, id, props);
 
-        if(!props.vpc)
-            throw new Error('VPC_NOT_FOUND');
-
         // extract private subnet 
         const privateSubnets = props.vpc.privateSubnets;
         
+        this.rdsSg = new ec2.SecurityGroup(this, 'Rds_Sg', {
+            vpc: props.vpc,
+            securityGroupName: 'rds-sg',
+            allowAllOutbound: true
+        });
+
         this.rdsInstance = new rds.DatabaseInstance(this, 'rds-instance', {
             vpc: props.vpc,
             vpcSubnets: { subnets: privateSubnets },
@@ -35,19 +41,20 @@ export class StorageStack extends cdk.Stack {
             credentials: rds.Credentials.fromPassword('root', cdk.SecretValue.unsafePlainText('pwivY5aW8EPPtWB')),
             databaseName: 'civiliansDb',
             removalPolicy: cdk.RemovalPolicy.DESTROY,
-            port: 3306
+            port: 3306,
+            securityGroups: [this.rdsSg]
         });
 
         this.feEcrRepository = new ecr.Repository(this, "FE_Repository", {
             repositoryName: 'next-app-repository',
             removalPolicy: cdk.RemovalPolicy.DESTROY ,
-            emptyOnDelete: true
+            emptyOnDelete: true,
         });
 
         this.beEcrRepository = new ecr.Repository(this, "BE_Repository", {
             repositoryName: 'nest-app-repository',
             removalPolicy: cdk.RemovalPolicy.DESTROY,
-            emptyOnDelete: true
+            emptyOnDelete: true,
         });
 
     }

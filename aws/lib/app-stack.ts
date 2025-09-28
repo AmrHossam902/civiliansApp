@@ -6,8 +6,13 @@ import { InfraProps } from "../props/infra-props";
 import { StorageProps } from "../props/storage-props";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 import { Port } from "aws-cdk-lib/aws-ec2";
+import { DnsRecordType } from "aws-cdk-lib/aws-servicediscovery";
 
 export class AppStack extends Stack {
+
+    feService: ecs.Ec2Service;
+    beService: ecs.Ec2Service;
+
     constructor(scope: Construct, id: string, props: StackProps & InfraProps & StorageProps) {
         super(scope, id, props);
 
@@ -31,9 +36,10 @@ export class AppStack extends Stack {
             networkMode: ecs.NetworkMode.BRIDGE,
         });
 
-        feTd.addContainer('Next_App_Container', {
+        const feContainerDef = new ecs.ContainerDefinition(this, 'Next_App_Container', {
+            taskDefinition: feTd,
             containerName: 'next-app-container',
-            image: ecs.ContainerImage.fromEcrRepository(props?.feEcrRepository),
+            image: ecs.ContainerImage.fromEcrRepository(props.feEcrRepository, 'latest'),
             cpu: 150,
             memoryLimitMiB: 200,           // hard limit
             memoryReservationMiB: 100,     // soft limit
@@ -63,9 +69,10 @@ export class AppStack extends Stack {
             networkMode: ecs.NetworkMode.BRIDGE,
         });
 
-        beTd.addContainer('GQL_Container', {
+        const beContainerDef = new ecs.ContainerDefinition(this, 'GQL_Container', {
+            taskDefinition: beTd,
             containerName: 'gql-container',
-            image: ecs.ContainerImage.fromEcrRepository(props?.beEcrRepository),
+            image: ecs.ContainerImage.fromEcrRepository(props.beEcrRepository, 'latest'),
             cpu: 150,
             memoryLimitMiB: 250,           // hard limit
             memoryReservationMiB: 100,     // soft limit
@@ -81,6 +88,7 @@ export class AppStack extends Stack {
 
                 PUBLIC_URL: `http://${props?.alb.loadBalancerDnsName}`,
                 FRONTEND_INTERNAL_URL:  'http://frontend',
+                JWT_SECRET : "sdhkj383nsdas&dasdas@daskh122jhcAjGsnSK3YcbsoG",
                 DB_HOST: props.rdsInstance.dbInstanceEndpointAddress,
                 DB_PORT: props.rdsInstance.dbInstanceEndpointPort,
                 DB_ROOT_PASSWORD: 'pwivY5aW8EPPtWB',
@@ -93,19 +101,36 @@ export class AppStack extends Stack {
         });
 
         // create services
-        const feService = new ecs.Ec2Service(this, "FE_Service", {
+        this.feService = new ecs.Ec2Service(this, "FE_Service", {
             serviceName: 'front-end-service',
             cluster: props.ecsCluster,
             taskDefinition: feTd,
             desiredCount: 1,
+            circuitBreaker: {
+                enable: true,
+                rollback: true
+            }
         });
 
-        const beService = new ecs.Ec2Service(this, "BE_Service", {
+        this.beService = new ecs.Ec2Service(this, "BE_Service", {
             serviceName: 'back-end-service',
             cluster: props.ecsCluster,
             taskDefinition: beTd,
             desiredCount: 1,
-            serviceConnectConfiguration: {
+            circuitBreaker: {
+                enable: true,
+                rollback: true
+            },
+            cloudMapOptions: {
+                cloudMapNamespace: props.ecsNs,
+                name: 'gql-api-service',
+                dnsRecordType: DnsRecordType.SRV,
+
+                container: beContainerDef, 
+                containerPort: 80   // determines which port inside the container to track its app by cloudmap
+
+            }
+/*             serviceConnectConfiguration: {
                 namespace: props.ecsNs.namespaceName,
                 services: [
                     {
@@ -115,18 +140,11 @@ export class AppStack extends Stack {
                                              // FQDN = <discoveryName>.<Namspace name>
                     }
                 ]
-            }
+            }, */
         });
 
-        props.feTG.addTarget(feService);
-        props.beTG.addTarget(beService);        
- 
-        feService.connections.allowFrom(props.alb, Port.allTcp());
-        beService.connections.allowFrom(props.alb, Port.allTcp());
-
-        // this way we force cloudformation to export the SG of rds
-/*         props.rdsInstance.connections.securityGroups[0]
-        .addIngressRule(beService.connections.securityGroups[0], Port.tcp(3306));
-         */
+        props.feTG.addTarget(this.feService);
+        props.beTG.addTarget(this.beService);        
+        
     }
 }

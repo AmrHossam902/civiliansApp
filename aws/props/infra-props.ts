@@ -3,8 +3,8 @@ import { ApplicationLoadBalancer, ApplicationTargetGroup } from 'aws-cdk-lib/aws
 import { IPrivateDnsNamespace } from 'aws-cdk-lib/aws-servicediscovery';
 
 export interface InfraProps {
-    ecsCluster: Cluster;
-    alb: ApplicationLoadBalancer;
+    ecsCluster: Cluster,
+    alb: ApplicationLoadBalancer,
     feTG: ApplicationTargetGroup,
     beTG: ApplicationTargetGroup,
     ecsNs: IPrivateDnsNamespace
