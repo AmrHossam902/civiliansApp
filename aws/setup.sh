@@ -18,17 +18,17 @@ aws ecr get-login-password --region us-east-1 | \
 
 # get url of alb
 echo 'extracting alb url'
-albUrl=$(aws cloudformation describe-stacks \
+albDns=$(aws cloudformation describe-stacks \
   --stack-name  infra-stack \
   --query 'Stacks[0].Outputs[?contains(OutputKey,`InternetFacingALB`)].OutputValue' \
   --output text
 );
-echo $albUrl;
+echo $albDns;
 
 # building next app
 echo "build next app"
 docker build -t next-app-repository \
-    --build-arg NEXT_PUBLIC_URL=$albUrl \
+    --build-arg NEXT_PUBLIC_URL=http://$albDns \
     --build-arg FRONTEND_CONTAINER_PORT=80 \
     ../FrontEnd/.;
 

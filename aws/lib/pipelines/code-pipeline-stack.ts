@@ -94,7 +94,7 @@ export class CodePipelineStack extends cdk.Stack {
                 build: {
                     commands: [
                         `docker build -t $REPO_URI:$IMAGE_TAG \
-                            --build-arg NEXT_PUBLIC_URL=$ALB_DNS_NAME \
+                            --build-arg NEXT_PUBLIC_URL=http://$ALB_DNS_NAME \
                             --build-arg FRONTEND_CONTAINER_PORT=80 \
                             .`,
                         "docker tag $REPO_URI:$IMAGE_TAG $REPO_URI:latest"
