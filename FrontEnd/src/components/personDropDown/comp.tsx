@@ -3,7 +3,7 @@ import "./personDropDown.styles.css";
 import { FaSearch } from "react-icons/fa";
 import { useCallback, useState } from "react";
 import Person from "@/dtos/Person";
-import { getPeople } from "@/services/person.service";
+import { getPeople } from "@/services/client-side/person.service";
 import InputState from "@/types/inputState";
 
 
