@@ -1,5 +1,6 @@
 import FamilyTreeComponent from "@/components/family/FamilyTreeComponent";
 import Person from "@/dtos/Person";
+import { SendRequestOnServer } from "@/services/server-side/api-client-onServer";
 import { cookies } from "next/headers";
 
 
@@ -14,14 +15,7 @@ export default async function PersonalDetails({ params }: {params: Params}) {
     console.log(token);
     const fetchData = async ()=>{
             
-        return fetch(`${process.env.BACKEND_INTERNAL_URL}/graphql`, {
-            "method": "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Cookie": `accessToken=${token?.value};`
-              },
-            cache: 'no-cache',
-            body: JSON.stringify({
+        return SendRequestOnServer({
                 query: `query someone($ssn: String!){
                     someone(ssn: $ssn) {
                         ...personDetails
@@ -90,10 +84,8 @@ export default async function PersonalDetails({ params }: {params: Params}) {
                 variables: {
                     ssn:params.ssn
                 }
-                
-            })
-        })
-        .then((res)=> res.json())
+            }, 
+            token?.value as string) 
         .catch( (e)=> {
             console.error(e);
             return {}
