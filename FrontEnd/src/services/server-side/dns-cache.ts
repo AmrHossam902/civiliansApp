@@ -68,7 +68,6 @@ class DnsCache {
         delete this.cache[dnsName];
     }
 
-
     private callDnsResolv(dnsName: string){
         
         const resolvSrv = promisify(dns.resolveSrv);

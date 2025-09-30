@@ -2,21 +2,13 @@ import dnsCache from "./dns-cache";
 
 
 
-export async function SendRequestOnServer(body: Object, accessToken : string){
+export async function SendRequestOnServer(reqObject: Object){
 
     /**
      * when using dev mode, it should return address used in compose
      */
     if(process.env.IS_DEV)
-        return fetch(process.env.BACKEND_INTERNAL_URL + "/graphql", {
-                "method": "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cookie": `accessToken=${accessToken};`
-                    },
-                cache: 'no-cache',
-                body: JSON.stringify(body)
-            })
+        return fetch(process.env.BACKEND_INTERNAL_URL + "/graphql", reqObject)
             .then( res => res.json() );
 
 
@@ -35,15 +27,7 @@ export async function SendRequestOnServer(body: Object, accessToken : string){
             let address = await dnsCache.resolve("gql-api-service"); // resolve has to check for blockage   
                                                             // resolve has to do rotation
 
-            response = await fetch("http://" + address+ "/graphql", {
-                "method": "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cookie": `accessToken=${accessToken};`
-                    },
-                cache: 'no-cache',
-                body: JSON.stringify(body)
-            })
+            response = await fetch("http://" + address+ "/graphql", reqObject)
             .then( res => res.json() );
 
             break;

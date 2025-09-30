@@ -15,31 +15,59 @@ export default async function PersonalDetails({ params }: {params: Params}) {
     console.log(token);
     const fetchData = async ()=>{
             
-        return SendRequestOnServer({
-                query: `query someone($ssn: String!){
-                    someone(ssn: $ssn) {
-                        ...personDetails
-
-                        parents {
-                            ...personDetails
-                            marriedTo{
-                                spouse{
-                                    id
-                                }
-                                marriageDate
-                            }
-                        }
-
-                        siblings {
+        return SendRequestOnServer(
+            {
+                "method": "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cookie": `accessToken=${token?.value};`
+                    },
+                cache: 'no-cache',
+                body: JSON.stringify({
+                    query: `query someone($ssn: String!){
+                        someone(ssn: $ssn) {
                             ...personDetails
 
                             parents {
-                                id
+                                ...personDetails
+                                marriedTo{
+                                    spouse{
+                                        id
+                                    }
+                                    marriageDate
+                                }
                             }
-                            
+
+                            siblings {
+                                ...personDetails
+
+                                parents {
+                                    id
+                                }
+                                
+                                marriedTo {
+                                    spouse {
+                                        ...personDetails
+                                    }
+                                    marriageDate
+                                    children {
+                                        ...personDetails
+                                    }
+                                }
+                            }
+
                             marriedTo {
                                 spouse {
                                     ...personDetails
+                                    parents {
+                                        ...personDetails
+                                        marriedTo{
+                                            spouse{
+                                                id
+                                            }
+                                            marriageDate
+                                        }
+                                    }
                                 }
                                 marriageDate
                                 children {
@@ -47,45 +75,25 @@ export default async function PersonalDetails({ params }: {params: Params}) {
                                 }
                             }
                         }
-
-                        marriedTo {
-                            spouse {
-                                ...personDetails
-                                parents {
-                                    ...personDetails
-                                    marriedTo{
-                                        spouse{
-                                            id
-                                        }
-                                        marriageDate
-                                    }
-                                }
-                            }
-                            marriageDate
-                            children {
-                                ...personDetails
-                            }
-                        }
                     }
-                }
-                
-                fragment personDetails on Person {
-                    id
-                    firstName
-                    middleName
-                    lastName
-                    ssn
-                    birthDate
-                    deathDate
-                    gender
-                }
-                
-                `,
-                variables: {
-                    ssn:params.ssn
-                }
-            }, 
-            token?.value as string) 
+                    
+                    fragment personDetails on Person {
+                        id
+                        firstName
+                        middleName
+                        lastName
+                        ssn
+                        birthDate
+                        deathDate
+                        gender
+                    }
+                    
+                    `,
+                    variables: {
+                        ssn:params.ssn
+                    }
+                })
+            }) 
         .catch( (e)=> {
             console.error(e);
             return {}
