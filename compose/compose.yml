@@ -33,6 +33,7 @@ services:
       NEXT_PUBLIC_URL: ${PUBLIC_URL}
       BACKEND_INTERNAL_URL : ${BACKEND_INTERNAL_URL}
       JWT_SECRET : ${JWT_SECRET}
+      IS_DEV : true
     networks:
       mynet:
         ipv4_address: 172.20.0.21
