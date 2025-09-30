@@ -4,7 +4,7 @@ import { Button, Input, Spinner } from "@nextui-org/react";
 import './login-styles.css';
 import { useCallback, useState } from "react";
 import InputState from "@/types/inputState";
-import { decodeJWT, login } from "@/services/auth.service";
+import { decodeJWT, login } from "@/services/client-side/auth.service";
 import { useRouter } from "next/navigation";
 
 export default function Login(){
