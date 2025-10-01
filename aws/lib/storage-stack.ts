@@ -39,7 +39,7 @@ export class StorageStack extends cdk.Stack {
             publiclyAccessible: false,
             deletionProtection: false,
             credentials: rds.Credentials.fromPassword('root', cdk.SecretValue.unsafePlainText('pwivY5aW8EPPtWB')),
-            databaseName: 'civiliansDb',
+            databaseName: 'civilDb',
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             port: 3306,
             securityGroups: [this.rdsSg]
