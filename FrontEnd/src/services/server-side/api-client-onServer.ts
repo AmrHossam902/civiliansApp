@@ -24,7 +24,7 @@ export async function SendRequestOnServer(reqObject: Object){
         try {
             
             // ask DnsCache for instance to call (abstract it for local & prod)
-            let address = await dnsCache.resolve("gql-api-service"); // resolve has to check for blockage   
+            let address = await dnsCache.resolve("gql-api-service.my-namespace"); // resolve has to check for blockage   
                                                             // resolve has to do rotation
 
             response = await fetch("http://" + address+ "/graphql", reqObject)
@@ -49,13 +49,13 @@ export async function SendRequestOnServer(reqObject: Object){
 
             // ENOTFOUND  means there were an instance and it was killed ==> redo dns
             if(error.errno == "ENOTFOUND")
-                dnsCache.remove("gql-api-service");
+                dnsCache.remove("gql-api-service.my-namespace");
 
 
             // check if third attempt
             if(i == 2){
-                dnsCache.blockService("gql-api-service");
-                setTimeout(()=>{ dnsCache.remove("gql-api-service") }, 15000);
+                dnsCache.blockService("gql-api-service.my-namespace");
+                setTimeout(()=>{ dnsCache.remove("gql-api-service.my-namespace") }, 15000);
             }
 
         }

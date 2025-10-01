@@ -7,7 +7,7 @@ const dns = require("dns");
  */
 type SRVRecord = {
     port: number,
-    instancName: string,
+    name: string,
     weight: number,
     priority: number,
 }
@@ -46,7 +46,7 @@ class DnsCache {
         this.cache[dnsName].next =
             ( this.cache[dnsName].next + 1 ) % this.cache[dnsName].srvRecords.length
         
-        const address = this.cache[dnsName].srvRecords[index].instancName + ":" +
+        const address = this.cache[dnsName].srvRecords[index].name + ":" +
                         this.cache[dnsName].srvRecords[index].port;
 
         console.log("cached addresses are ,", this.cache[dnsName]);
