@@ -1,3 +1,4 @@
+import { SendRequestOnServer } from "@/services/server-side/api-client-onServer";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 function refreshAT(AT: string, RT: string){
     
-    return fetch(`${process.env.BACKEND_INTERNAL_URL}/graphql`, {
+    return SendRequestOnServer({
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -63,5 +64,4 @@ function refreshAT(AT: string, RT: string){
             }
         })
     })
-    .then( res => res.json())
 }

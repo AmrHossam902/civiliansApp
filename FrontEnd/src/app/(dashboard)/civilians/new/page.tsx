@@ -13,9 +13,9 @@ import Person from "@/dtos/Person";
 import InputState from "@/types/inputState";
 import { MarriageRecord } from "@/dtos/MarriageRecord";
 import PersonAutoComplete from "@/components/personDropDown/comp";
-import { getMarriageRecord } from "@/services/marriage-records.service";
+import { getMarriageRecord } from "@/services/client-side/marriage-records.service";
 import { Gender } from "@/types/gender";
-import { createNewPerson } from "@/services/person.service";
+import { createNewPerson } from "@/services/client-side/person.service";
 
 
 enum PARENTS_STATE {

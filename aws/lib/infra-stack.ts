@@ -83,7 +83,7 @@ export class InfrastructureStack extends cdk.Stack {
         new elbv2.ApplicationListenerRule(this, 'BE_Listener_Rule', {
             priority: 1,
             listener: listener,
-            conditions: [elbv2.ListenerCondition.pathPatterns(['/graphql/*'])],
+            conditions: [elbv2.ListenerCondition.pathPatterns(['/graphql'])],
             action: elbv2.ListenerAction.forward([this.beTG])
         });
 

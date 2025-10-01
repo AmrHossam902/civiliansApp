@@ -1,7 +1,7 @@
 'use client'
 import { SearchComponent } from "@/components/search/searchComponent";
 import { SideBarComponent } from "@/components/sidebar/sideBarComponent";
-import { sendRequest } from "@/services/api-client";
+import { sendRequest } from "@/services/client-side/api-client";
 import { Button, Input, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import  Link  from 'next/link';
 import { Key, useEffect, useRef, useState } from "react";
