@@ -5,6 +5,7 @@ import { Construct } from 'constructs';
 import { NetworkProps } from '../props/network-props';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import path from 'path';
 
 export class StorageStack extends cdk.Stack {
@@ -38,7 +39,12 @@ export class StorageStack extends cdk.Stack {
             multiAz: false,
             publiclyAccessible: false,
             deletionProtection: false,
-            credentials: rds.Credentials.fromPassword('root', cdk.SecretValue.unsafePlainText('pwivY5aW8EPPtWB')),
+
+            // not the best sol for security but keep it to limit costs
+            credentials: rds.Credentials.fromPassword(
+                ssm.StringParameter.fromStringParameterName(this,"Db_User",'/my-app/db-user').stringValue,
+                cdk.SecretValue.ssmSecure('/my-app/db-password')
+            ),
             databaseName: 'civilDb',
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             port: 3306,
