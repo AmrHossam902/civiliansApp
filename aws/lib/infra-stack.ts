@@ -109,6 +109,8 @@ export class InfrastructureStack extends cdk.Stack {
             securityGroupName: 'ec2-sg'
         });
 
+        const instaceKeyPair = ec2.KeyPair.fromKeyPairName(this, "K_Pair", "server");
+
         const asg = new AutoScalingGroup(this, "ECS_Asg", {
             autoScalingGroupName: 'ecs-asg',
             vpc: props.vpc,
@@ -137,7 +139,7 @@ export class InfrastructureStack extends cdk.Stack {
 
             securityGroup: this.ec2Sg,
 
-            keyPair: ec2.KeyPair.fromKeyPairName(this, "K_Pair", "server")
+            keyPair: instaceKeyPair
             
         });
 
@@ -148,8 +150,19 @@ export class InfrastructureStack extends cdk.Stack {
             enableManagedScaling: true,
             minimumScalingStepSize: 1,
             maximumScalingStepSize: 1,
-            targetCapacityPercent: 75,  // thr (cpu) to scale around
-            instanceWarmupPeriod: 120, // 2 mins
+
+            /**
+             * target at which scaling events should happen,
+             * this is will be the threshold of a custom metric 
+             * calculated as follows (number of needed ec2 instances as integer / number of current ec2 instances as integer) * 100
+             * ,
+             * so a single running task of (150 cpu & 200MB) would "need" a single instance,
+             * and 2 running tasks each of (150 cpu & 200MB) would "need" also a single instance 
+             * and so on until single instance is not enough then the needed number will be 2
+             * 
+             */
+            targetCapacityPercent: 100, // default
+            instanceWarmupPeriod: 300, // 5 mins
 
         })
 
@@ -159,18 +172,64 @@ export class InfrastructureStack extends cdk.Stack {
         });
 
         this.ecsCluster.addAsgCapacityProvider(ecsCapProvider);
+
         
+        /** ///////////////////
+         * bastion host setup
+         */ ///////////////////
         
-        // connect security groups
+        const bhSg = new ec2.SecurityGroup(this, "Bastion_Sg", {
+            vpc: props.vpc,
+            securityGroupName: 'bastion-host-security-group'
+        });
+
+        bhSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.SSH);
+    
+
+        const bastionHost = new ec2.Instance(this, "Bastion_Host", {
+            instanceType: ec2.InstanceType.of(
+                ec2.InstanceClass.T2,
+                ec2.InstanceSize.MICRO
+            ),
+            machineImage: ec2.MachineImage.latestAmazonLinux2023(),
+            vpc: props.vpc,
+            keyPair: instaceKeyPair,
+            instanceName: 'bastion-host',
+            vpcSubnets: {
+                subnets: props.vpc.publicSubnets
+            },
+            securityGroup: bhSg
+        });
+
+        /** //////////////////////////////
+         *      wiring security groups
+         *////////////////////////////////
+
+        // connect alb & ASG
         this.albSg.addEgressRule(this.ec2Sg, ec2.Port.allTcp(), "allow traffic only to ec2 ASG");
         this.ec2Sg.addIngressRule(this.albSg, ec2.Port.allTcp(), "allow all ingress from the ALB");
         
-        new ec2.CfnSecurityGroupIngress(this, 'Rds_Ingres_Rule', {
+
+        // connect ASG & rds
+        // Asg allows all outbound by default 
+        // use cfn construct to prevent the rule from being lifted up to storage stack
+        new ec2.CfnSecurityGroupIngress(this, 'Rds_Allow_Asg_Traffic', {
             groupId: props.rdsSg.securityGroupId,
             ipProtocol: 'tcp',
             fromPort: 3306,
             toPort: 3306,
             sourceSecurityGroupId: this.ec2Sg.securityGroupId
+        });
+
+        // connect Bastion Host & rds
+        // Bastion allows all outbound by default
+        // use cfn construct to prevent the rule from being lifted up to storage stack
+        new ec2.CfnSecurityGroupIngress(this, 'Rds_Allow_BHost_Traffic', {
+            groupId: props.rdsSg.securityGroupId,
+            ipProtocol: 'tcp',
+            fromPort: 3306,
+            toPort: 3306,
+            sourceSecurityGroupId: bhSg.securityGroupId
         });
 
     }

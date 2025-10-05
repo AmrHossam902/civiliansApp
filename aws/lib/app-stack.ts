@@ -1,4 +1,4 @@
-import { RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
+import { Duration, RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -7,6 +7,7 @@ import { StorageProps } from "../props/storage-props";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 import { Port } from "aws-cdk-lib/aws-ec2";
 import { DnsRecordType } from "aws-cdk-lib/aws-servicediscovery";
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 export class AppStack extends Stack {
 
@@ -29,6 +30,21 @@ export class AppStack extends Stack {
             logGroupName: 'app-logs'
         });
 
+        const jwtSecretParam = ssm.StringParameter.fromSecureStringParameterAttributes(
+            this,
+            "Jwt_Secret",{
+                parameterName: '/my-app/jwt-secret'
+            }
+        );
+
+        const DbPassParam = ssm.StringParameter.fromSecureStringParameterAttributes(
+            this,
+            "Db_Pass",{
+                parameterName: "/my-app/db-password"
+            }
+        );
+
+
         // define task definintions
         const feTd = new ecs.Ec2TaskDefinition(this, "FE_Task_Definition", {
             executionRole: taskExecutionRole,
@@ -50,10 +66,12 @@ export class AppStack extends Stack {
                 }
             ],
             essential: true,
+            secrets: {
+                JWT_SECRET: ecs.Secret.fromSsmParameter(jwtSecretParam),
+            },
             environment: {
                 NEXT_PUBLIC_URL: `http://${props?.alb.loadBalancerDnsName}`,
                 BACKEND_INTERNAL_URL : `http://gql-api`,
-                JWT_SECRET : "sdhkj383nsdas&dasdas@daskh122jhcAjGsnSK3YcbsoG",
                 HOST: "0.0.0.0",
                 PORT: "80"
             },
@@ -84,14 +102,15 @@ export class AppStack extends Stack {
                 }
             ],
             essential: true,
+            secrets: {
+                JWT_SECRET : ecs.Secret.fromSsmParameter(jwtSecretParam),
+                DB_ROOT_PASSWORD: ecs.Secret.fromSsmParameter(DbPassParam)
+            },
             environment: {
-
                 PUBLIC_URL: `http://${props?.alb.loadBalancerDnsName}`,
                 FRONTEND_INTERNAL_URL:  'http://frontend',
-                JWT_SECRET : "sdhkj383nsdas&dasdas@daskh122jhcAjGsnSK3YcbsoG",
                 DB_HOST: props.rdsInstance.dbInstanceEndpointAddress,
                 DB_PORT: props.rdsInstance.dbInstanceEndpointPort,
-                DB_ROOT_PASSWORD: 'pwivY5aW8EPPtWB',
                 PORT: "80"
             },
             logging: ecs.LogDrivers.awsLogs({
@@ -109,8 +128,18 @@ export class AppStack extends Stack {
             circuitBreaker: {
                 enable: true,
                 rollback: true
-            }
+            },
         });
+
+        // setup target tracking scaling for front end service
+        const feAutoScaling = this.feService.autoScaleTaskCount({ minCapacity: 1, maxCapacity: 3 });
+        feAutoScaling.scaleOnCpuUtilization("Front_Scaling_Policy", {
+            targetUtilizationPercent: 80,
+            policyName: "front-scaling-policy",
+            scaleInCooldown: Duration.minutes(5),
+            scaleOutCooldown: Duration.minutes(5),
+        })
+
 
         this.beService = new ecs.Ec2Service(this, "BE_Service", {
             serviceName: 'back-end-service',
@@ -142,6 +171,16 @@ export class AppStack extends Stack {
                 ]
             }, */
         });
+
+        // setup target tracking scaling for back end service
+        const beAutoScaling = this.beService.autoScaleTaskCount({ minCapacity: 1, maxCapacity: 3 });
+        beAutoScaling.scaleOnCpuUtilization("Back_Scaling_Policy", {
+            targetUtilizationPercent: 80,
+            policyName: "back-scaling-policy",
+            scaleInCooldown: Duration.minutes(5),
+            scaleOutCooldown: Duration.minutes(5),
+        })
+
 
         props.feTG.addTarget(this.feService);
         props.beTG.addTarget(this.beService);        
