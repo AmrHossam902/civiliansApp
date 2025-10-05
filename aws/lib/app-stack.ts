@@ -1,4 +1,4 @@
-import { RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
+import { Duration, RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -128,8 +128,18 @@ export class AppStack extends Stack {
             circuitBreaker: {
                 enable: true,
                 rollback: true
-            }
+            },
         });
+
+        // setup target tracking scaling for front end service
+        const feAutoScaling = this.feService.autoScaleTaskCount({ minCapacity: 1, maxCapacity: 3 });
+        feAutoScaling.scaleOnCpuUtilization("Front_Scaling_Policy", {
+            targetUtilizationPercent: 80,
+            policyName: "front-scaling-policy",
+            scaleInCooldown: Duration.minutes(5),
+            scaleOutCooldown: Duration.minutes(5),
+        })
+
 
         this.beService = new ecs.Ec2Service(this, "BE_Service", {
             serviceName: 'back-end-service',
@@ -161,6 +171,16 @@ export class AppStack extends Stack {
                 ]
             }, */
         });
+
+        // setup target tracking scaling for back end service
+        const beAutoScaling = this.beService.autoScaleTaskCount({ minCapacity: 1, maxCapacity: 3 });
+        beAutoScaling.scaleOnCpuUtilization("Back_Scaling_Policy", {
+            targetUtilizationPercent: 80,
+            policyName: "back-scaling-policy",
+            scaleInCooldown: Duration.minutes(5),
+            scaleOutCooldown: Duration.minutes(5),
+        })
+
 
         props.feTG.addTarget(this.feService);
         props.beTG.addTarget(this.beService);        
