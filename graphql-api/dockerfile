@@ -9,7 +9,7 @@ ADD src ./src
 RUN npm run build
 
 from node:20-alpine
-copy --from=builder /app/dist ./dist
+copy --from=builder /app/dist /var/www/html/dist
 COPY --from=builder /app/node_modules ./node_modules
 
 ENTRYPOINT [ "node", "dist/main.js" ]
