@@ -33,6 +33,7 @@ export class StorageStack extends cdk.Stack {
             engine: rds.DatabaseInstanceEngine.mysql({
                 version: rds.MysqlEngineVersion.VER_8_0_41,
             }),
+            //free teir eligible
             instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO),
             allocatedStorage: 20,
             maxAllocatedStorage: 20,

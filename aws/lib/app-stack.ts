@@ -71,7 +71,7 @@ export class AppStack extends Stack {
             },
             environment: {
                 NEXT_PUBLIC_URL: `http://${props?.alb.loadBalancerDnsName}`,
-                BACKEND_INTERNAL_URL : `http://gql-api`,
+                BACKEND_INTERNAL_URL : `http://gql-api-service`,
                 HOST: "0.0.0.0",
                 PORT: "80"
             },
@@ -125,9 +125,11 @@ export class AppStack extends Stack {
             cluster: props.ecsCluster,
             taskDefinition: feTd,
             desiredCount: 1,
+            /* minHealthyPercent: 100, // def =  50% 
+            maxHealthyPercent: 100, // def = 200% */
             circuitBreaker: {
                 enable: true,
-                rollback: true
+                rollback: true,
             },
         });
 
