@@ -23,14 +23,9 @@ export async function middleware(request: NextRequest) {
         );
         return NextResponse.next();
     } catch (error) {
-        console.error("fuckin' error", error);
+        console.error("error", error);
         return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/api/refresh?redirect=${request.nextUrl.pathname}`);   
     }
-}
-
-
-function setMyFuckinCookie(){
-    cookies().set("shitCookie", Date.now().toString());
 }
 
 export const config = {

@@ -43,7 +43,6 @@ export const DbProvider = {
             return res;
         });
 
-
         
         return sequelize;
     }
