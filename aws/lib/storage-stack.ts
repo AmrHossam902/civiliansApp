@@ -4,9 +4,8 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import { NetworkProps } from '../props/network-props';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
-import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
-import path from 'path';
+
 
 export class StorageStack extends cdk.Stack {
 

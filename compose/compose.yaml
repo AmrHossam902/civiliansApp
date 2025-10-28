@@ -24,6 +24,7 @@ services:
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     environment:
+      IS_DEV: true
       JWT_SECRET: ${JWT_SECRET}
       NEXT_PUBLIC_URL: ${PUBLIC_URL}
       BACKEND_INTERNAL_URL : ${API_URL}
@@ -43,7 +44,7 @@ services:
       FRONTEND_INTERNAL_URL: ${FRONTEND_URL}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
-      PORT: "80"
+      PORT: ${API_PORT}
       
     depends_on:
       - mysql
